@@ -8,17 +8,8 @@
 | 빌드 | `npm run build` → `dist/` (의존성 없음, Node 22+) |
 | 로컬에서 보기 | `npm run dev` → http://localhost:4321 |
 | 테스트 | `npm test` (`node:test`) · 전체 검사 `npm run check` |
-| 배포(기본) | **공개 배포 레포 분리** — 이 소스 레포는 private. `main` 에 머지되면 `.github/workflows/deploy-public.yml` 이 테스트 · 빌드 후 `dist/` 만 public 레포 `ingo-lab/ingo-lab.github.io` 에 push → GitHub Pages 가 https://ingo-lab.github.io/ 로 게시. 서버 불필요. 설정은 아래 「공개 배포」 |
+| 배포(기본) | **GitHub Pages** — `main` 에 머지되면 `.github/workflows/pages.yml` 이 테스트 · 빌드 후 자동 게시. 주소 https://ingo-lab.github.io/research_ingo_cv/ . 서버 불필요. 처음 한 번만 Settings → Pages → Source = **GitHub Actions** (레포가 public 이어야 무료) |
 | 배포(대안) | Cloudflare Workers assets — `npm run deploy` (`wrangler.jsonc`) |
-
-## 공개 배포 (처음 한 번)
-1. GitHub 에서 **public** 레포 `ingo-lab.github.io` 를 만든다(README 로 초기화). Settings → Pages → Source = *Deploy from a branch*, Branch = `main` / `/ (root)`.
-2. Settings(계정) → Developer settings → **Fine-grained token** 생성: Repository access = `ingo-lab.github.io` 만, Permissions → Contents = **Read and write**.
-3. 이 레포(`research_ingo_cv`) Settings → Secrets and variables → Actions → New secret `PAGES_DEPLOY_TOKEN` 에 2의 토큰을 넣는다.
-4. 이 레포 Settings → General → Danger Zone → **Change visibility → Private**.
-5. Actions 탭에서 `deploy-public` 을 한 번 실행하거나 `main` 에 머지 → https://ingo-lab.github.io/ 확인.
-
-public 레포에는 빌드된 HTML · CSS · 글꼴만 올라간다. `cv.json` · 테스트 · 워크플로는 private 에 남는다. 다른 public 레포로 보내려면 Actions 변수 `PAGES_REPO` 를 `owner/name` 으로 둔다.
 
 ## 구조
 - `src/render.mjs` — `cv.json` → HTML 로 바꾸는 순수 함수(`esc` · `bi` · `validate` · `renderPage`). 두 언어를 모두 HTML 에 넣고 CSS(`html[data-lang]`)로 하나만 보여 준다.
