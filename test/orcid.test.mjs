@@ -122,7 +122,7 @@ test("describe lists every kept and skipped work so a sync log shows exactly wha
   assert.match(text, /skipped .*No proof at all.*identifier/);
 });
 
-test("ORCID patent ids are kept only as proof (not shown); preprints are marked", () => {
+test("ORCID patents are synced as-is (no link), the Lens profile lives in Contact only, preprints are marked", () => {
   const w = (o) => ({ "work-summary": [summary(o)] });
   const { record } = parseWorks({
     group: [
@@ -130,16 +130,13 @@ test("ORCID patent ids are kept only as proof (not shown); preprints are marked"
       w({ putCode: 2, title: "A preprint", type: "PREPRINT", year: 2026, ids: [{ "external-id-type": "doi", "external-id-value": "10.21203/rs.3.rs-1/v1" }] }),
     ],
   });
-  assert.equal(record[0].ref, "133-544-147-073-270");
-  assert.equal(record[0].number, undefined);
+  assert.equal(record[0].number, "133-544-147-073-270");
   assert.equal(record[1].subtype, "preprint");
   const page = renderPage({ ...cv, record: [...cv.record, ...record.map((r) => ({ ...r, authors: ["Jung B"], venue: "" }))] });
-  assert.ok(!page.includes("133-544-147-073-270"));
-  assert.ok(!page.includes("lens.org/lens/patent"));
-  const contact = page.slice(page.indexOf('id="contact"'));
-  assert.ok(contact.includes('href="https://link.lens.org/iKq9HjWBeUd"'));
-  assert.ok(!page.slice(0, page.indexOf('id="contact"')).includes("link.lens.org"));
   const card = page.slice(page.indexOf("Some patent"));
-  assert.ok(card.slice(0, card.indexOf("</li>")).includes('href="https://orcid.org/0009-0003-8264-3228"'));
+  assert.ok(!card.slice(0, card.indexOf("</li>")).includes("<a "));
+  const at = page.indexOf('id="contact"');
+  assert.ok(page.slice(at).includes('href="https://link.lens.org/iKq9HjWBeUd"'));
+  assert.ok(!page.slice(0, at).includes("link.lens.org"));
   assert.match(page, /data-count="preprints" data-to="1"/);
 });

@@ -18,9 +18,6 @@ const numberOf = (s) => {
   return hit ? String(hit["external-id-value"]).trim() : "";
 };
 
-// 000-000-000-000-00X ids are database ids, not patent office numbers: kept as proof, never shown.
-const INTERNAL_ID = /^\d{3}-\d{3}-\d{3}-\d{3}-\d{2}[\dX]$/;
-
 function toEntry(s) {
   const title = s?.title?.title?.value;
   const type = norm(s?.type);
@@ -32,15 +29,11 @@ function toEntry(s) {
   if (!Number.isInteger(year)) return { skip: { title, reason: "no publication year" } };
   const month = Number(s?.["publication-date"]?.month?.value);
   const doi = doiOf(s);
-  // The id ORCID gives for a patent is kept only as proof the work exists; it is not shown (it is not an office number).
-  const raw = kind === "patent" ? numberOf(s) : "";
-  const internal = INTERNAL_ID.test(raw);
-  const ref = internal ? raw : "";
-  const number = internal ? "" : raw;
+  const number = kind === "patent" ? numberOf(s) : "";
   const url = s?.url?.value && /^https?:\/\//.test(s.url.value) ? s.url.value : "";
-  if (!doi && !number && !ref && !url) return { skip: { title, reason: "no verifiable identifier (DOI, number or URL)" } };
+  if (!doi && !number && !url) return { skip: { title, reason: "no verifiable identifier (DOI, number or URL)" } };
   const venue = s?.["journal-title"]?.value ?? "";
-  const entry = { year, ...(month >= 1 && month <= 12 && { month }), type: kind, ...(type === "preprint" && { subtype: "preprint" }), title, ...(doi && { doi }), ...(number && { number }), ...(ref && { ref }), ...(url && !doi && { url }), ...(venue && { venue }) };
+  const entry = { year, ...(month >= 1 && month <= 12 && { month }), type: kind, ...(type === "preprint" && { subtype: "preprint" }), title, ...(doi && { doi }), ...(number && { number }), ...(url && !doi && { url }), ...(venue && { venue }) };
   return { entry };
 }
 
@@ -63,7 +56,7 @@ export function parseWorks(json) {
 // Plain-text lines for the sync log: exactly what ORCID returned and what was kept or skipped.
 export function describe({ record = [], skipped = [], typeCounts = {} }) {
   const types = Object.entries(typeCounts).map(([k, n]) => `${k}=${n}`).join(", ") || "none";
-  const kept = record.map((r) => `kept ${r.type} ${r.year}${r.month ? `.${String(r.month).padStart(2, "0")}` : ""} "${r.title}" (${r.doi || r.number || r.ref || r.url})`);
+  const kept = record.map((r) => `kept ${r.type} ${r.year}${r.month ? `.${String(r.month).padStart(2, "0")}` : ""} "${r.title}" (${r.doi || r.number || r.url})`);
   const skip = skipped.map((s) => `skipped "${s.title}": ${s.reason}`);
   return [`ORCID types: ${types}`, ...kept, ...skip];
 }
