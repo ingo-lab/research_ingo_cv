@@ -465,3 +465,12 @@ test("build.mjs stamps the page with that version", () => {
   assert.match(src, /assetVersion\(/);
   assert.match(src, /renderPage\(cv,\s*\{\s*assetVersion:\s*version\s*\}\)/);
 });
+
+test("every project shows stack chips and topic keywords", () => {
+  for (const p of cv.projects) {
+    assert.ok(p.stack?.length, `${p.id} stack`);
+    assert.ok(p.topics?.length, `${p.id} topics`);
+    for (const s of p.stack) assert.ok(html.includes(`<li>${esc(s)}</li>`), s);
+    for (const t of p.topics) assert.ok(html.includes(esc(t.en)), t.en);
+  }
+});

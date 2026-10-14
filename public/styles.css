@@ -297,3 +297,5 @@ html[data-lang="ko"] [data-l="en"], html[data-lang="en"] [data-l="ko"] { display
 .edu .period { display: block; margin-top: 2px; }
 
 .proj .stack { margin-top: 8px; margin-bottom: 0; }
+.proj .stack.topics + .stack { margin-top: 6px; }
+.stack.topics li { font-family: var(--sans, inherit); font-weight: 600; color: var(--prussian); background: var(--prussian-tint); border-color: transparent; }
