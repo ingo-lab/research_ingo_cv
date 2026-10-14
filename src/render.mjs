@@ -176,15 +176,15 @@ export function renderPage(cv) {
 <meta name="description" content="${esc(plain(cv.person.tagline))}">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(plain(cv.person.tagline, "en"))}">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="preload" href="/fonts/pretendard-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/pretendard-variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
 <script>try{var t=localStorage.getItem("cv-theme");if(t)document.documentElement.dataset.theme=t;var l=localStorage.getItem("cv-lang");if(l){document.documentElement.dataset.lang=l;document.documentElement.lang=l}}catch(e){}</script>
 </head>
 <body>
 <a class="skip" href="#about">${bi({ ko: "본문으로", en: "Skip to content" })}</a>
 <div class="topbar"><div class="topbar-in">
-  <a class="brand" href="#top" aria-label="Top"><img src="/favicon.svg" alt="" width="20" height="20"><span class="mono">CV</span></a>
+  <a class="brand" href="#top" aria-label="Top"><img src="favicon.svg" alt="" width="20" height="20"><span class="mono">CV</span></a>
   ${nav()}
   <div class="tools">
     <button type="button" class="lang" data-action="lang" aria-label="Language">KO / EN</button>
@@ -198,7 +198,7 @@ ${body(cv)}
 </div>
 </main>
 <footer class="foot"><div class="wrap"><p class="mono">${bi(UI.updated)} ${esc(cv.meta?.updated ?? "")} · ${bi({ ko: "INGO v10 디자인 토큰으로 제작", en: "Built with INGO v10 design tokens" })}</p></div></footer>
-<script src="/site.js" defer></script>
+<script src="site.js" defer></script>
 </body>
 </html>
 `;

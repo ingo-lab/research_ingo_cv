@@ -92,3 +92,10 @@ test("validate rejects malformed emails and non-http identifier links", () => {
   assert.ok(errors.some((e) => e.includes("emails")));
   assert.ok(errors.some((e) => e.includes("identifiers")));
 });
+
+test("asset paths are relative so the site works under a subpath (GitHub Pages)", () => {
+  const html = renderPage(cv);
+  assert.doesNotMatch(html, /(href|src)="\/[^/]/);
+  const css = readFileSync(new URL("../public/styles.css", import.meta.url), "utf8");
+  assert.doesNotMatch(css, /url\("\//);
+});

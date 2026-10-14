@@ -1,7 +1,7 @@
 {
   "$comment": "CV 내용의 단일 원본. 빈 문자열(\"\")은 화면에 '준비 중 / Coming soon' 으로 보이고 빌드가 경고로 알려 준다. 날짜 · 수치는 source 를 단다. 추측으로 채우지 않는다.",
   "meta": {
-    "siteUrl": "",
+    "siteUrl": "https://ingo-lab.github.io/research_ingo_cv/",
     "updated": "2026-10-14"
   },
   "person": {
