@@ -111,7 +111,7 @@ function recordLinks(r) {
   if (r.doi) l.push(ext(`https://doi.org/${r.doi}`, "DOI"));
   if (r.pmid) l.push(ext(`https://pubmed.ncbi.nlm.nih.gov/${r.pmid}/`, "PubMed"));
   if (r.lensId) l.push(ext(`https://www.lens.org/lens/patent/${r.lensId}`, "Lens"));
-  if (r.url) l.push(ext(r.url, "Link"));
+  if (r.url && !r.lensId) l.push(ext(r.url, "Link"));
   return l.length ? `<p class="links">${l.join("")}</p>` : "";
 }
 
