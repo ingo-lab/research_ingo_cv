@@ -5,11 +5,11 @@ const HTTP = /^https?:\/\//;
 const EMAIL = /^[^\s@<>"]+@[^\s@<>"]+\.[a-z]{2,}$/i;
 const TBD = { ko: "준비 중", en: "Coming soon" };
 const UI = {
-  record: { ko: "연구실적", en: "Research record" },
-  education: { ko: "학력", en: "Education" },
-  projects: { ko: "프로젝트", en: "Projects" },
-  skills: { ko: "관심 분야 · 기술", en: "Interests · Skills" },
-  contact: { ko: "연락", en: "Contact" },
+  record: "Research",
+  education: "Education",
+  projects: "Projects",
+  skills: "Interests & Skills",
+  contact: "Contact",
   paper: { ko: "논문", en: "Paper" },
   patent: { ko: "특허", en: "Patent" },
   project: { ko: "프로젝트", en: "Project" },
@@ -19,7 +19,7 @@ const UI = {
   review: { ko: "리뷰", en: "Review" },
   first: { ko: "제1저자", en: "First author" },
   monthUnknown: { ko: "월 미상", en: "Month unknown" },
-  toc: { ko: "목차", en: "Contents" },
+  toc: "Contents",
   pos: { ko: "공저자", en: "Author" },
   labPapers: { ko: "함께한 공동 논문", en: "Co-authored papers with the lab" },
   papers: { ko: "논문", en: "Papers" },
@@ -195,20 +195,6 @@ function allLinks(cv) {
   return [...ids, ...mails, ...gh].join("");
 }
 
-function sideLinks(cv) {
-  const row = (label, text, href) => `<li><span class="mono">${esc(label)}</span><a href="${esc(href)}" rel="noopener">${esc(text)}</a></li>`;
-  const byId = (id) => (cv.identifiers ?? []).find((x) => x.id === id);
-  const orcid = byId("orcid");
-  const wos = byId("wos");
-  const rows = [
-    orcid && row("ORCID", orcid.value, orcid.url),
-    wos && row("WoS", wos.value, wos.url),
-    cv.contact?.github && row("GitHub", cv.contact.github.replace(HTTP, ""), cv.contact.github),
-    ...(cv.contact?.emails ?? []).map((e) => row("Email", e, `mailto:${e}`)),
-  ].filter(Boolean);
-  return `<ul class="side-links">${rows.join("")}</ul>`;
-}
-
 function toc() {
   const items = SECTIONS.map((s, i) => `<li><a href="#${s}"><span class="mono">${String(i + 1).padStart(2, "0")}</span>${bi(UI[s])}</a></li>`).join("");
   return `<nav class="toc" aria-label="${esc(plain(UI.toc))}"><ol>${items}</ol></nav>`;
@@ -219,23 +205,21 @@ const tools = (cls) => `<div class="tools ${cls}">
     <button type="button" class="theme" data-action="theme" aria-label="${esc(plain(UI.theme))}">◐</button>
   </div>`;
 
-function profile(cv) {
+function hero(cv) {
   const p = cv.person;
-  return `<aside class="side" id="top">
-  <div class="side-top">
+  return `<header class="hero" id="top">
+  <div class="hero-in">
+    ${tools("hero-tools")}
     <div class="mono-badge" aria-hidden="true">${esc(monogram(p.name))}</div>
     <p class="eyebrow">${bi(p.role)}</p>
     <h1>${bi(p.name)}</h1>
     <p class="affil">${bi(p.affiliation)}</p>
-  </div>
-  <div class="side-body">
     <p class="intro">${bi(p.intro)}</p>
-    ${sideLinks(cv)}
-    ${toc()}
-    ${tools("side-tools")}
   </div>
-</aside>`;
+</header>`;
 }
+
+const rail = () => `<aside class="rail">${toc()}${tools("rail-tools")}</aside>`;
 
 function body(cv) {
   const wrap = (id, inner) =>
@@ -275,8 +259,9 @@ export function renderPage(cv) {
   ${nav()}
   ${tools("top-tools")}
 </div></div>
-<div class="shell">
-${profile(cv)}
+${hero(cv)}
+<div class="layout">
+${rail()}
 <main class="main">
 ${body(cv)}
 <footer class="foot"><p class="mono">${bi(UI.updated)} ${esc(cv.meta?.updated ?? "")}${cv.meta?.syncedAt ? ` · <span data-synced="${esc(cv.meta.syncedAt)}">${bi(UI.synced)} ${esc(cv.meta.syncedAt)}</span>` : ""}</p></footer>
