@@ -1,10 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { esc, bi, emptyPaths, validate, renderPage, groupByYear } from "../src/render.mjs";
+import { esc, bi, emptyPaths, validate, renderPage, groupByYear, studyYear } from "../src/render.mjs";
 
 const cv = JSON.parse(readFileSync(new URL("../cv.json", import.meta.url), "utf8"));
-const html = renderPage(cv);
+const html = renderPage(cv, { today: new Date("2026-10-14") });
 
 test("esc escapes HTML-significant characters", () => {
   assert.equal(esc(`<a href="x">&'</a>`), "&lt;a href=&quot;x&quot;&gt;&amp;&#39;&lt;/a&gt;");
@@ -331,7 +331,7 @@ test('the faculty advisor 구태윤 is named with "교수님" and no English spe
 
 test("the intro mentions the 2023 enrollment and the current year of study", () => {
   assert.match(cv.person.intro.ko, /2023/);
-  assert.match(cv.person.intro.ko, /의학과 1학년/);
+  assert.match(html, /의학과 1학년에 재학 중/);
   assert.match(cv.person.intro.en, /2023/);
 });
 
@@ -352,8 +352,8 @@ test("a hero banner comes first, then the layout with the table of contents rail
 test("the hero carries the name, role, affiliation and the personal intro, in both languages", () => {
   const hero = html.slice(html.indexOf('<header class="hero"'), html.indexOf("</header>", html.indexOf('<header class="hero"')));
   assert.match(hero, /Bokeum Jung/);
-  assert.ok(hero.includes(esc(cv.person.intro.ko)), "intro ko");
-  assert.ok(hero.includes(esc(cv.person.intro.en)), "intro en");
+  assert.ok(hero.includes(esc(cv.person.intro.ko.replace("{year}", "1"))), "intro ko");
+  assert.ok(hero.includes(esc(cv.person.intro.en.replace("{year}", "1"))), "intro en");
   assert.match(hero, /충남대학교 의과대학/);
 });
 
@@ -473,4 +473,22 @@ test("every project shows stack chips and topic keywords", () => {
     for (const s of p.stack) assert.ok(html.includes(`<li>${esc(s)}</li>`), s);
     for (const t of p.topics) assert.ok(html.includes(esc(t.en)), t.en);
   }
+});
+
+test("year of study is computed from the date and rolls over every March", () => {
+  assert.equal(studyYear("2026-03", new Date("2026-03-01")), 1);
+  assert.equal(studyYear("2026-03", new Date("2027-02-28")), 1);
+  assert.equal(studyYear("2026-03", new Date("2027-03-01")), 2);
+  assert.equal(studyYear("2026-03", new Date("2029-03-01")), 4);
+  assert.equal(studyYear("2026-03", new Date("2035-01-01")), 4);
+  const next = renderPage(cv, { today: new Date("2027-04-01") });
+  assert.match(next, /의학과 2학년 재학 중/);
+  assert.match(next, /year 2/);
+  assert.ok(!next.includes("{year}"));
+});
+
+test("a {year} placeholder without a medicalFrom date is rejected", () => {
+  const c = structuredClone(cv);
+  delete c.education[0].medicalFrom;
+  assert.ok(validate(c).errors.some((e) => e.includes("medicalFrom")));
 });

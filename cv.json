@@ -22,8 +22,8 @@
       "en": "Chungnam National University College of Medicine"
     },
     "intro": {
-      "ko": "충남대학교 의과대학에 2023년 입학해 현재 의학과 1학년에 재학 중인 의학도이자 연구자입니다. 프로그래밍과 생물정보학, 뇌과학에 관심이 많고, 2024년 2월부터 2025년 7월까지 조은경 교수님 연구실에서 연구에 참여했습니다. 지금은 연구자가 더 빨리 생각하고 실험할 수 있도록 돕는 연구 도구 INGO 를 만들고 있습니다.",
-      "en": "A medical student and researcher at Chungnam National University College of Medicine: enrolled in 2023 and now in the first year of the medical course. I am interested in programming, bioinformatics and neuroscience, and I took part in research in Prof. Eun-Kyeong Jo's lab from February 2024 to July 2025. Now I am building INGO, a research tool that helps scientists think and experiment faster."
+      "ko": "충남대학교 의과대학에 2023년 입학해 현재 의학과 {year}학년에 재학 중인 의학도이자 연구자입니다. 프로그래밍과 생물정보학, 뇌과학에 관심이 많고, 2024년 2월부터 2025년 7월까지 조은경 교수님 연구실에서 연구에 참여했습니다. 지금은 연구자가 더 빨리 생각하고 실험할 수 있도록 돕는 연구 도구 INGO 를 만들고 있습니다.",
+      "en": "A medical student and researcher at Chungnam National University College of Medicine: enrolled in 2023 and now in year {year} of the medical course. I am interested in programming, bioinformatics and neuroscience, and I took part in research in Prof. Eun-Kyeong Jo's lab from February 2024 to July 2025. Now I am building INGO, a research tool that helps scientists think and experiment faster."
     }
   },
   "record": [
@@ -189,8 +189,8 @@
         "en": "Chungnam National University College of Medicine"
       },
       "degree": {
-        "ko": "의학과 1학년 재학 중",
-        "en": "Medical course, year 1 (in progress)"
+        "ko": "의학과 {year}학년 재학 중",
+        "en": "Medical course, year {year} (in progress)"
       },
       "period": {
         "ko": "2023.03 입학 – 재학 중",
@@ -214,11 +214,13 @@
         {
           "date": "2026.03",
           "text": {
-            "ko": "의학과 진입 · 현재 1학년",
-            "en": "Entered the medical course · now in year 1"
+            "ko": "의학과 진입 · 현재 {year}학년",
+            "en": "Entered the medical course · now in year {year}"
           }
         }
-      ]
+      ],
+      "medicalFrom": "2026-03",
+      "medicalYears": 4
     }
   ],
   "projects": [

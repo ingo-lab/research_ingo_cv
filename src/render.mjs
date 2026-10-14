@@ -77,6 +77,7 @@ const verifiable = (r) => Boolean(r.doi || r.url || r.number || r.lensId || r.se
 
 export function validate(cv) {
   const errors = [];
+  if (JSON.stringify(cv ?? {}).includes("{year}") && !cv?.education?.some((e) => e.medicalFrom)) errors.push('"{year}" is used but no education entry has medicalFrom (YYYY-MM)');
   if (!cv?.person?.affiliation) errors.push("person.affiliation is required");
   for (const key of ["record", "projects", "skills", "interests"]) {
     if (!Array.isArray(cv?.[key])) errors.push(`${key} must be an array`);
@@ -240,7 +241,23 @@ function body(cv) {
 const nav = () =>
   `<nav class="nav" aria-label="Sections"><ul>${SECTIONS.map((s) => `<li><a href="#${s}">${bi(UI[s])}</a></li>`).join("")}</ul></nav>`;
 
-export function renderPage(cv, opts = {}) {
+// Year of study from the date the medical course began (academic years roll over every March; capped at the course length).
+export function studyYear(from, today = new Date(), max = 4) {
+  const [y, m] = String(from).split("-").map(Number);
+  const months = (today.getFullYear() - y) * 12 + (today.getMonth() + 1 - m);
+  return Math.min(max, Math.max(1, Math.floor(months / 12) + 1));
+}
+
+// Replaces "{year}" in every string of the CV with the computed year of study (returns a new object).
+export function withStudyYear(cv, today = new Date()) {
+  const edu = cv.education?.find((e) => e.medicalFrom);
+  const year = edu ? studyYear(edu.medicalFrom, today, edu.medicalYears ?? 4) : "";
+  const walk = (v) => (typeof v === "string" ? v.replaceAll("{year}", String(year)) : Array.isArray(v) ? v.map(walk) : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, walk(x)])) : v);
+  return walk(cv);
+}
+
+export function renderPage(input, opts = {}) {
+  const cv = withStudyYear(input, opts.today);
   const v = opts.assetVersion ? `?v=${esc(opts.assetVersion)}` : "";
   const title = `${plain(cv.person.name)} · ${plain(cv.person.affiliation)}`;
   return `<!doctype html>
