@@ -22,5 +22,6 @@
 - 링크는 `http(s)` 만 허용(`validate`).
 
 ## 채워야 할 칸
-`npm run build` 경고 목록이 정본이다. 지금: 이름(`person.name`) · 사진 · 학년/기간(`education.0.period`) · 이메일 · ORCID · Google Scholar · 논문/발표(`publications`) · 사이트 주소(`meta.siteUrl`).
-`publications` 항목 모양: `{ "year": 2026, "title": "...", "venue": "...", "url": "https://..." }`.
+`npm run build` 경고 목록이 정본이다. 지금: 학년/기간(`education.0.period`) · 사이트 주소(`meta.siteUrl`).
+논문은 연구자 ID(`identifiers`: ORCID · Web of Science ResearcherID)로 연결한다. 개별 항목을 직접 보이고 싶으면 `publications` 에
+`{ "year": 2026, "title": "...", "venue": "...", "url": "https://..." }` 모양으로 넣는다(원문에서 확인한 것만).

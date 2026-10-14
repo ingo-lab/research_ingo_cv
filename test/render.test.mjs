@@ -53,12 +53,42 @@ test("renderPage contains every section and the real affiliation", () => {
   assert.match(html, /<html lang="ko" data-lang="ko">/);
 });
 
-test("renderPage shows a placeholder instead of inventing missing facts", () => {
-  const html = renderPage(cv);
-  assert.match(html, /id="publications"[\s\S]*class="tbd"/);
+test("renderPage never invents publication entries", () => {
+  const html = renderPage({ ...cv, publications: [] });
+  assert.doesNotMatch(html, /class="pubs"/);
+  const bare = renderPage({ ...cv, publications: [], identifiers: [] });
+  assert.match(bare.slice(bare.indexOf('id="publications"')), /class="tbd"/);
 });
 
 test("renderPage cites a source next to every stat", () => {
   const html = renderPage(cv);
   for (const s of cv.projects[0].stats) assert.ok(html.includes(esc(s.source)), s.source);
+});
+
+test("renderPage shows the name in the hero and the <title>", () => {
+  const html = renderPage(cv);
+  assert.match(html, /<title>Bokeum Jung · /);
+  assert.match(html, /<h1>(<span data-l="ko">)?Bokeum Jung/);
+});
+
+test("renderPage links every email with mailto", () => {
+  const html = renderPage(cv);
+  for (const e of cv.contact.emails) assert.ok(html.includes(`href="mailto:${e}"`), e);
+});
+
+test("renderPage lists researcher IDs with links in the publications section", () => {
+  const html = renderPage(cv);
+  const pubs = html.slice(html.indexOf('id="publications"'), html.indexOf('id="contact"'));
+  assert.match(pubs, /0009-0003-8264-3228/);
+  assert.match(pubs, /href="https:\/\/orcid\.org\/0009-0003-8264-3228"/);
+  assert.match(pubs, /RHD-7236-2026/);
+});
+
+test("validate rejects malformed emails and non-http identifier links", () => {
+  const broken = structuredClone(cv);
+  broken.contact.emails = ["not-an-email"];
+  broken.identifiers[0].url = "ftp://x";
+  const { errors } = validate(broken);
+  assert.ok(errors.some((e) => e.includes("emails")));
+  assert.ok(errors.some((e) => e.includes("identifiers")));
 });

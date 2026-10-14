@@ -254,3 +254,7 @@ html[data-lang="ko"] .pen { font: 500 1.05rem/1.4 var(--sans); letter-spacing: -
   .card { box-shadow: none; break-inside: avoid; }
   .js .reveal { opacity: 1; transform: none; }
 }
+.note { color: var(--ink-muted); margin: 0 0 14px; }
+.idents .ident { display: grid; gap: 6px; border-left: 3px solid var(--bridge); }
+.ident[data-id="orcid"] { border-left-color: var(--ok); }
+.ident a b { font: 600 1.15rem var(--mono); letter-spacing: -0.01em; }

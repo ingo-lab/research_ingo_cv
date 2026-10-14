@@ -5,29 +5,83 @@
     "updated": "2026-10-14"
   },
   "person": {
-    "name": { "ko": "", "en": "" },
-    "role": { "ko": "의과대학 학생 · 연구자", "en": "Medical student · Researcher" },
-    "affiliation": { "ko": "충남대학교 의과대학", "en": "Chungnam National University College of Medicine" },
+    "name": {
+      "ko": "Bokeum Jung",
+      "en": "Bokeum Jung"
+    },
+    "role": {
+      "ko": "의과대학 학생 · 연구자",
+      "en": "Medical student · Researcher"
+    },
+    "affiliation": {
+      "ko": "충남대학교 의과대학",
+      "en": "Chungnam National University College of Medicine"
+    },
     "tagline": {
       "ko": "의학을 공부하며, 연구자가 더 빨리 생각하고 실험할 수 있는 도구를 직접 설계하고 만듭니다.",
       "en": "Studying medicine while designing and building the tools that help researchers think and experiment faster."
-    },
-    "photo": ""
+    }
   },
   "about": {
     "ko": "충남대학교 의과대학에 재학 중인 연구자입니다. 프로그래밍 · 생물정보학(bioinformatics) · 뇌과학에 관심이 많고, 연구실의 매일 일을 한곳에 모으는 연구실 작업대 INGO 를 기획 · 디자인 · 개발하고 있습니다. 공개 서지 데이터만 쓰고, 수치에는 출처를 달고, 판정 대신 근거를 보여 주는 도구를 만드는 것이 원칙입니다.",
     "en": "A researcher at Chungnam National University College of Medicine, interested in programming, bioinformatics and neuroscience. I plan, design and build INGO — a lab workbench that brings a lab's daily work into one place. My rules: public bibliographic data only, a source for every number, and evidence instead of verdicts."
   },
   "interests": [
-    { "id": "programming", "label": { "ko": "프로그래밍", "en": "Programming" }, "note": { "ko": "TypeScript 모노레포 · 테스트 먼저 · 작은 함수", "en": "TypeScript monorepos · test-first · small functions" } },
-    { "id": "bioinformatics", "label": { "ko": "생물정보학", "en": "Bioinformatics" }, "note": { "ko": "공개 서지 · 유전자 세트 · 데이터 파이프라인", "en": "Public literature · gene sets · data pipelines" } },
-    { "id": "neuroscience", "label": { "ko": "뇌과학", "en": "Neuroscience" }, "note": { "ko": "뇌 · 신경과학 전반", "en": "Brain and neural science" } },
-    { "id": "research-tools", "label": { "ko": "연구 도구 설계", "en": "Research tooling" }, "note": { "ko": "연구자의 일을 30초 안에 보여 주는 화면", "en": "Screens that surface a researcher's next move in 30 seconds" } }
+    {
+      "id": "programming",
+      "label": {
+        "ko": "프로그래밍",
+        "en": "Programming"
+      },
+      "note": {
+        "ko": "TypeScript 모노레포 · 테스트 먼저 · 작은 함수",
+        "en": "TypeScript monorepos · test-first · small functions"
+      }
+    },
+    {
+      "id": "bioinformatics",
+      "label": {
+        "ko": "생물정보학",
+        "en": "Bioinformatics"
+      },
+      "note": {
+        "ko": "공개 서지 · 유전자 세트 · 데이터 파이프라인",
+        "en": "Public literature · gene sets · data pipelines"
+      }
+    },
+    {
+      "id": "neuroscience",
+      "label": {
+        "ko": "뇌과학",
+        "en": "Neuroscience"
+      },
+      "note": {
+        "ko": "뇌 · 신경과학 전반",
+        "en": "Brain and neural science"
+      }
+    },
+    {
+      "id": "research-tools",
+      "label": {
+        "ko": "연구 도구 설계",
+        "en": "Research tooling"
+      },
+      "note": {
+        "ko": "연구자의 일을 30초 안에 보여 주는 화면",
+        "en": "Screens that surface a researcher's next move in 30 seconds"
+      }
+    }
   ],
   "education": [
     {
-      "org": { "ko": "충남대학교 의과대학", "en": "Chungnam National University College of Medicine" },
-      "degree": { "ko": "의학과 재학", "en": "Medical student (in progress)" },
+      "org": {
+        "ko": "충남대학교 의과대학",
+        "en": "Chungnam National University College of Medicine"
+      },
+      "degree": {
+        "ko": "의학과 재학",
+        "en": "Medical student (in progress)"
+      },
       "period": ""
     }
   ],
@@ -40,78 +94,265 @@
         "ko": "연구자가 누구와 · 무엇을 · 언제 연구할지 정하고, 실험 노트 · 결과 · 재고 · 주문 · 장비를 한곳에서 다루는 연구실 작업대.",
         "en": "A lab workbench for deciding who to work with, what to study and when — plus notebooks, results, inventory, orders and equipment in one place."
       },
-      "role": { "ko": "기획 · 제품 디자인 · 풀스택 개발 · AI 에이전트 협업 운영", "en": "Product planning · design · full-stack development · running the AI-agent workflow" },
-      "period": { "ko": "2026-09 – 현재", "en": "Sep 2026 – present" },
+      "role": {
+        "ko": "기획 · 제품 디자인 · 풀스택 개발 · AI 에이전트 협업 운영",
+        "en": "Product planning · design · full-stack development · running the AI-agent workflow"
+      },
+      "period": {
+        "ko": "2026-09 – 현재",
+        "en": "Sep 2026 – present"
+      },
       "periodSource": "github.com/ingo-lab/ingo · CITATION.cff date-released 2026-09-29",
       "links": [
-        { "label": "GitHub", "url": "https://github.com/ingo-lab/ingo" }
+        {
+          "label": "GitHub",
+          "url": "https://github.com/ingo-lab/ingo"
+        }
       ],
       "highlights": [
-        { "ko": "근거 시계(Evidence Clock) — 권고별 발행 이후 신규 RCT · SR 수를 판정어 없이 수치 + 원문 링크로", "en": "Evidence Clock — new RCTs / SRs since each guideline, as numbers + source links, never verdicts" },
-        { "ko": "연구실 우주(Lab Universe) — OpenAlex 실데이터 기반 3D 연구실 관계도", "en": "Lab Universe — a 3D map of labs built from real OpenAlex data" },
-        { "ko": "학회 캘린더 — 사람이 PR 로 쓰는 YAML → .ics, 마감 D-30 충돌 카드", "en": "Conference calendar — human-reviewed YAML → .ics, D-30 deadline collision cards" },
-        { "ko": "Lab OS — 재고 · Lot · 주문(요청 → 승인 → 발송 → 입고) · 장비 예약 · 프로토콜 · 승인(IBC · IACUC · IRB)", "en": "Lab OS — inventory, lots, orders (request → approve → ship → receive), equipment, protocols, IBC · IACUC · IRB approvals" },
-        { "ko": "공개 서지 커넥터 — OpenAlex · PubMed · Europe PMC · Crossref · ORCID · Semantic Scholar · iCite · OSF 등, 출처마다 1파일 + 테스트", "en": "Literature connectors — OpenAlex, PubMed, Europe PMC, Crossref, ORCID, Semantic Scholar, iCite, OSF … one file + tests per source" }
+        {
+          "ko": "근거 시계(Evidence Clock) — 권고별 발행 이후 신규 RCT · SR 수를 판정어 없이 수치 + 원문 링크로",
+          "en": "Evidence Clock — new RCTs / SRs since each guideline, as numbers + source links, never verdicts"
+        },
+        {
+          "ko": "연구실 우주(Lab Universe) — OpenAlex 실데이터 기반 3D 연구실 관계도",
+          "en": "Lab Universe — a 3D map of labs built from real OpenAlex data"
+        },
+        {
+          "ko": "학회 캘린더 — 사람이 PR 로 쓰는 YAML → .ics, 마감 D-30 충돌 카드",
+          "en": "Conference calendar — human-reviewed YAML → .ics, D-30 deadline collision cards"
+        },
+        {
+          "ko": "Lab OS — 재고 · Lot · 주문(요청 → 승인 → 발송 → 입고) · 장비 예약 · 프로토콜 · 승인(IBC · IACUC · IRB)",
+          "en": "Lab OS — inventory, lots, orders (request → approve → ship → receive), equipment, protocols, IBC · IACUC · IRB approvals"
+        },
+        {
+          "ko": "공개 서지 커넥터 — OpenAlex · PubMed · Europe PMC · Crossref · ORCID · Semantic Scholar · iCite · OSF 등, 출처마다 1파일 + 테스트",
+          "en": "Literature connectors — OpenAlex, PubMed, Europe PMC, Crossref, ORCID, Semantic Scholar, iCite, OSF … one file + tests per source"
+        }
       ],
       "stats": [
-        { "value": "T-101", "label": { "ko": "번호 붙은 작업 카드", "en": "numbered task cards" }, "source": "plan/roadmap.md" },
-        { "value": "v10", "label": { "ko": "디자인 시스템 버전", "en": "design-system iteration" }, "source": "design/v10/README.md" },
-        { "value": "PHI 0", "label": { "ko": "환자 데이터 저장 금지 원칙", "en": "no patient data, by design" }, "source": "spec/adr/0002" }
+        {
+          "value": "T-101",
+          "label": {
+            "ko": "번호 붙은 작업 카드",
+            "en": "numbered task cards"
+          },
+          "source": "plan/roadmap.md"
+        },
+        {
+          "value": "v10",
+          "label": {
+            "ko": "디자인 시스템 버전",
+            "en": "design-system iteration"
+          },
+          "source": "design/v10/README.md"
+        },
+        {
+          "value": "PHI 0",
+          "label": {
+            "ko": "환자 데이터 저장 금지 원칙",
+            "en": "no patient data, by design"
+          },
+          "source": "spec/adr/0002"
+        }
       ],
-      "stack": ["TypeScript", "React 19", "Vite", "Hono", "Cloudflare Workers", "Supabase · Postgres", "zod", "Vitest", "Playwright", "pnpm monorepo"]
+      "stack": [
+        "TypeScript",
+        "React 19",
+        "Vite",
+        "Hono",
+        "Cloudflare Workers",
+        "Supabase · Postgres",
+        "zod",
+        "Vitest",
+        "Playwright",
+        "pnpm monorepo"
+      ]
     },
     {
       "id": "cv-site",
       "featured": false,
-      "name": { "ko": "이 CV 사이트", "en": "This CV site" },
+      "name": {
+        "ko": "이 CV 사이트",
+        "en": "This CV site"
+      },
       "summary": {
         "ko": "INGO 소개 사이트의 구조(의존성 없는 빌드 · 정적 배포)와 v10 디자인 토큰을 그대로 가져와 cv.json 한 파일로 만드는 개인 사이트.",
         "en": "A personal site generated from one cv.json, reusing the INGO intro site's dependency-free static build and the v10 design tokens."
       },
-      "role": { "ko": "디자인 · 개발", "en": "Design · development" },
-      "period": { "ko": "2026-10", "en": "Oct 2026" },
+      "role": {
+        "ko": "디자인 · 개발",
+        "en": "Design · development"
+      },
+      "period": {
+        "ko": "2026-10",
+        "en": "Oct 2026"
+      },
       "links": [
-        { "label": "GitHub", "url": "https://github.com/ingo-lab/research_ingo_cv" }
+        {
+          "label": "GitHub",
+          "url": "https://github.com/ingo-lab/research_ingo_cv"
+        }
       ],
       "highlights": [],
       "stats": [],
-      "stack": ["Node (no deps)", "HTML · CSS", "node:test", "Cloudflare Workers assets"]
+      "stack": [
+        "Node (no deps)",
+        "HTML · CSS",
+        "node:test",
+        "Cloudflare Workers assets"
+      ]
     }
   ],
   "practice": [
     {
-      "title": { "ko": "디자인을 기준으로", "en": "Design as the source of truth" },
-      "body": { "ko": "Claude Design 으로 만든 시안을 버전 폴더(v10)로 고정하고, 코드가 시안과 다르면 시안이 이깁니다. 색 · 글꼴 · 간격은 토큰 한 벌.", "en": "Design exports are frozen as versioned folders (v10); when code and design disagree, design wins. One token set for colour, type and spacing." }
+      "title": {
+        "ko": "디자인을 기준으로",
+        "en": "Design as the source of truth"
+      },
+      "body": {
+        "ko": "Claude Design 으로 만든 시안을 버전 폴더(v10)로 고정하고, 코드가 시안과 다르면 시안이 이깁니다. 색 · 글꼴 · 간격은 토큰 한 벌.",
+        "en": "Design exports are frozen as versioned folders (v10); when code and design disagree, design wins. One token set for colour, type and spacing."
+      }
     },
     {
-      "title": { "ko": "테스트 먼저, 작게", "en": "Test first, keep it small" },
-      "body": { "ko": "실패하는 테스트 → 구현 → 검증. 함수 50줄 · 파일 800줄 이하, 데이터 계약은 zod 스키마 한 곳.", "en": "Failing test → implementation → verification. Functions under 50 lines, files under 800, one zod schema per data contract." }
+      "title": {
+        "ko": "테스트 먼저, 작게",
+        "en": "Test first, keep it small"
+      },
+      "body": {
+        "ko": "실패하는 테스트 → 구현 → 검증. 함수 50줄 · 파일 800줄 이하, 데이터 계약은 zod 스키마 한 곳.",
+        "en": "Failing test → implementation → verification. Functions under 50 lines, files under 800, one zod schema per data contract."
+      }
     },
     {
-      "title": { "ko": "사람 + AI 에이전트 팀", "en": "Humans + AI agents as one team" },
-      "body": { "ko": "Claude Code · Cursor 등 여러 에이전트가 하나의 AGENTS.md 규칙을 따릅니다. 작업 번호 · draft PR 잠금 · 결정 로그(D-xxx) · 세션 기록으로 병렬 작업이 겹치지 않게 합니다.", "en": "Claude Code, Cursor and other agents follow a single AGENTS.md. Task numbers, draft-PR locks, a decision log (D-xxx) and session logs keep parallel work from colliding." }
+      "title": {
+        "ko": "사람 + AI 에이전트 팀",
+        "en": "Humans + AI agents as one team"
+      },
+      "body": {
+        "ko": "Claude Code · Cursor 등 여러 에이전트가 하나의 AGENTS.md 규칙을 따릅니다. 작업 번호 · draft PR 잠금 · 결정 로그(D-xxx) · 세션 기록으로 병렬 작업이 겹치지 않게 합니다.",
+        "en": "Claude Code, Cursor and other agents follow a single AGENTS.md. Task numbers, draft-PR locks, a decision log (D-xxx) and session logs keep parallel work from colliding."
+      }
     },
     {
-      "title": { "ko": "연구 윤리를 코드로", "en": "Research ethics, enforced in code" },
-      "body": { "ko": "공개 서지만 사용, 생성된 아이디어엔 항상 라벨, 날짜 · 수치엔 출처, 환자 데이터 0. 어기면 머지가 막힙니다.", "en": "Public bibliographic data only, generated ideas always labelled, sources on every date and number, zero patient data — violations block the merge." }
+      "title": {
+        "ko": "연구 윤리를 코드로",
+        "en": "Research ethics, enforced in code"
+      },
+      "body": {
+        "ko": "공개 서지만 사용, 생성된 아이디어엔 항상 라벨, 날짜 · 수치엔 출처, 환자 데이터 0. 어기면 머지가 막힙니다.",
+        "en": "Public bibliographic data only, generated ideas always labelled, sources on every date and number, zero patient data — violations block the merge."
+      }
     }
   ],
   "skills": [
-    { "group": { "ko": "언어 · 프론트엔드", "en": "Languages · frontend" }, "items": ["TypeScript", "JavaScript", "React", "HTML · CSS", "Vite"] },
-    { "group": { "ko": "백엔드 · 데이터", "en": "Backend · data" }, "items": ["Hono", "Cloudflare Workers", "Supabase", "PostgreSQL", "zod"] },
-    { "group": { "ko": "연구 데이터", "en": "Research data" }, "items": ["OpenAlex", "PubMed · NCBI", "Europe PMC", "Crossref", "ORCID", "Semantic Scholar"] },
-    { "group": { "ko": "품질 · 협업", "en": "Quality · collaboration" }, "items": ["Vitest", "Playwright E2E", "GitHub PR flow", "Claude Code", "Cursor", "Claude Design"] }
+    {
+      "group": {
+        "ko": "언어 · 프론트엔드",
+        "en": "Languages · frontend"
+      },
+      "items": [
+        "TypeScript",
+        "JavaScript",
+        "React",
+        "HTML · CSS",
+        "Vite"
+      ]
+    },
+    {
+      "group": {
+        "ko": "백엔드 · 데이터",
+        "en": "Backend · data"
+      },
+      "items": [
+        "Hono",
+        "Cloudflare Workers",
+        "Supabase",
+        "PostgreSQL",
+        "zod"
+      ]
+    },
+    {
+      "group": {
+        "ko": "연구 데이터",
+        "en": "Research data"
+      },
+      "items": [
+        "OpenAlex",
+        "PubMed · NCBI",
+        "Europe PMC",
+        "Crossref",
+        "ORCID",
+        "Semantic Scholar"
+      ]
+    },
+    {
+      "group": {
+        "ko": "품질 · 협업",
+        "en": "Quality · collaboration"
+      },
+      "items": [
+        "Vitest",
+        "Playwright E2E",
+        "GitHub PR flow",
+        "Claude Code",
+        "Cursor",
+        "Claude Design"
+      ]
+    }
   ],
   "timeline": [
-    { "date": "2026-09-29", "text": { "ko": "INGO Research 시작 (플랫폼 설계 스펙 v1)", "en": "INGO Research begins (platform spec v1)" }, "source": "CITATION.cff · spec/product.md" },
-    { "date": "2026-10-08", "text": { "ko": "v10 디자인(영어 크롬 · 폰트 패치) 머지 — 시각 기준 확정", "en": "v10 design merged — visual source of truth fixed" }, "source": "design/v10/README.md" },
-    { "date": "2026-10-14", "text": { "ko": "작업 카드 T-101 까지 진행 · 이 CV 사이트 공개", "en": "Work reaches task T-101 · this CV site launched" }, "source": "plan/roadmap.md" }
+    {
+      "date": "2026-09-29",
+      "text": {
+        "ko": "INGO Research 시작 (플랫폼 설계 스펙 v1)",
+        "en": "INGO Research begins (platform spec v1)"
+      },
+      "source": "CITATION.cff · spec/product.md"
+    },
+    {
+      "date": "2026-10-08",
+      "text": {
+        "ko": "v10 디자인(영어 크롬 · 폰트 패치) 머지 — 시각 기준 확정",
+        "en": "v10 design merged — visual source of truth fixed"
+      },
+      "source": "design/v10/README.md"
+    },
+    {
+      "date": "2026-10-14",
+      "text": {
+        "ko": "작업 카드 T-101 까지 진행 · 이 CV 사이트 공개",
+        "en": "Work reaches task T-101 · this CV site launched"
+      },
+      "source": "plan/roadmap.md"
+    }
   ],
   "publications": [],
   "contact": {
-    "email": "",
-    "github": "https://github.com/ingo-lab",
-    "orcid": "",
-    "scholar": ""
+    "emails": [
+      "bokeumi03@gmail.com",
+      "ingo7183@gmail.com"
+    ],
+    "github": "https://github.com/ingo-lab"
+  },
+  "identifiers": [
+    {
+      "id": "orcid",
+      "label": "ORCID",
+      "value": "0009-0003-8264-3228",
+      "url": "https://orcid.org/0009-0003-8264-3228"
+    },
+    {
+      "id": "wos",
+      "label": "Web of Science ResearcherID",
+      "value": "RHD-7236-2026",
+      "url": "https://www.webofscience.com/wos/author/record/RHD-7236-2026"
+    }
+  ],
+  "publicationsNote": {
+    "ko": "논문 · 발표 전체 목록은 아래 연구자 ID 에서 최신으로 볼 수 있습니다.",
+    "en": "The full, up-to-date list of publications is on the researcher profiles below."
   }
 }

@@ -10,7 +10,7 @@ const UI = {
   skills: { ko: "기술", en: "Skills" },
   timeline: { ko: "타임라인", en: "Timeline" },
   education: { ko: "학력", en: "Education" },
-  publications: { ko: "논문 · 발표", en: "Publications" },
+  publications: { ko: "논문 · 연구자 ID", en: "Publications · Researcher IDs" },
   contact: { ko: "연락", en: "Contact" },
   featured: { ko: "대표 프로젝트", en: "Featured" },
   role: { ko: "역할", en: "Role" },
@@ -20,6 +20,9 @@ const UI = {
   theme: { ko: "테마 전환", en: "Toggle theme" },
 };
 const SECTIONS = ["about", "interests", "projects", "practice", "skills", "timeline", "education", "publications", "contact"];
+
+const HTTP = /^https?:\/\//;
+const EMAIL = /^[^\s@<>"]+@[^\s@<>"]+\.[a-z]{2,}$/i;
 
 export function esc(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -52,9 +55,11 @@ export function validate(cv) {
     (p.stats ?? []).forEach((s, j) => { if (!s.source) errors.push(`projects.${i}.stats.${j}.source is required`); });
     (p.links ?? []).forEach((l, j) => { if (!/^https?:\/\//.test(l.url)) errors.push(`projects.${i}.links.${j}.url must be http(s)`); });
   });
+  (cv?.contact?.emails ?? []).forEach((e, i) => { if (!EMAIL.test(e)) errors.push(`contact.emails.${i} is not an email`); });
   for (const [k, v] of Object.entries(cv?.contact ?? {})) {
-    if (v && k !== "email" && !/^https?:\/\//.test(v)) errors.push(`contact.${k} url must be http(s)`);
+    if (k !== "emails" && v && !HTTP.test(v)) errors.push(`contact.${k} url must be http(s)`);
   }
+  (cv?.identifiers ?? []).forEach((x, i) => { if (!HTTP.test(x.url)) errors.push(`identifiers.${i}.url must be http(s)`); });
   return { errors, warnings: emptyPaths(cv ?? {}) };
 }
 
@@ -117,10 +122,28 @@ const eduItem = (e) =>
 const pubItem = (p) =>
   `<li><span class="mono">${esc(p.year ?? "")}</span> ${p.url ? `<a href="${esc(p.url)}" rel="noopener" target="_blank">${esc(p.title)}</a>` : esc(p.title)} <em>${esc(p.venue ?? "")}</em></li>`;
 
-function contactBlock(c) {
+const idCard = (x) =>
+  `<li class="card ident" data-id="${esc(x.id)}"><span class="mono">${esc(x.label)}</span><a href="${esc(x.url)}" rel="noopener" target="_blank"><b>${esc(x.value)}</b> ↗</a></li>`;
+
+function publications(cv) {
+  const list = cv.publications ?? [];
+  const ids = cv.identifiers ?? [];
+  if (!list.length && !ids.length) return `<p class="empty">${bi("")}</p>`;
+  return [
+    list.length ? `<ol class="pubs">${list.map(pubItem).join("")}</ol>` : "",
+    ids.length && cv.publicationsNote ? `<p class="note">${bi(cv.publicationsNote)}</p>` : "",
+    ids.length ? `<ul class="grid g2 idents">${ids.map(idCard).join("")}</ul>` : "",
+  ].join("");
+}
+
+function contactBlock(c, ids = []) {
   const row = (label, val, href) =>
-    `<li><span class="mono">${label}</span>${val ? `<a href="${esc(href)}" rel="noopener">${esc(val.replace(/^https?:\/\//, ""))}</a>` : bi("")}</li>`;
-  return `<ul class="contact">${row("Email", c.email, `mailto:${c.email}`)}${row("GitHub", c.github, c.github)}${row("ORCID", c.orcid, c.orcid)}${row("Scholar", c.scholar, c.scholar)}</ul>`;
+    `<li><span class="mono">${esc(label)}</span><a href="${esc(href)}" rel="noopener">${esc(val.replace(HTTP, ""))}</a></li>`;
+  const emails = (c.emails ?? []).map((e) => row("Email", e, `mailto:${e}`));
+  const gh = c.github ? [row("GitHub", c.github, c.github)] : [];
+  const orcid = ids.filter((x) => x.id === "orcid").map((x) => row(x.label, x.value, x.url));
+  const rows = [...emails, ...gh, ...orcid];
+  return rows.length ? `<ul class="contact">${rows.join("")}</ul>` : `<p class="empty">${bi("")}</p>`;
 }
 
 function body(cv) {
@@ -132,10 +155,8 @@ function body(cv) {
     skills: `<div class="grid g2">${cv.skills.map(skillGroup).join("")}</div>`,
     timeline: `<ol class="timeline">${cv.timeline.map(timelineItem).join("")}</ol>`,
     education: `<ul class="grid g2">${(cv.education ?? []).map(eduItem).join("")}</ul>`,
-    publications: (cv.publications ?? []).length
-      ? `<ol class="pubs">${cv.publications.map(pubItem).join("")}</ol>`
-      : `<p class="empty">${bi("")}</p>`,
-    contact: contactBlock(cv.contact ?? {}),
+    publications: publications(cv),
+    contact: contactBlock(cv.contact ?? {}, cv.identifiers),
   };
   return SECTIONS.map((id, i) => wrap(id, i + 1, parts[id])).join("\n");
 }
