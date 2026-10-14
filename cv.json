@@ -236,7 +236,14 @@
       "role": {
         "ko": "기획 · 디자인 · 개발",
         "en": "Planning · design · development"
-      }
+      },
+      "stack": [
+        "TypeScript",
+        "React",
+        "Vite",
+        "Supabase",
+        "Cloudflare"
+      ]
     },
     {
       "id": "guideone",
