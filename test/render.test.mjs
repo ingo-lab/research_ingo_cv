@@ -291,13 +291,13 @@ test('Korean text always says "교수님" for the professor (never a bare "교�
   assert.match(html, /조은경 교수님 연구실/);
 });
 
-test("KCHAMPf is listed as a current program, with nothing invented about it", () => {
-  const k = cv.record.find((r) => /KCHAMPf/.test(JSON.stringify(r.title)));
+test("KCHAMP is listed as a current program, with nothing invented about it", () => {
+  const k = cv.record.find((r) => /KCHAMP/.test(JSON.stringify(r.title)));
   assert.ok(k, "cv.json has a KCHAMPf entry");
   assert.equal(k.type, "program");
   assert.equal(k.ongoing, true);
   assert.equal(k.selfReported, true);
-  assert.match(html, /KCHAMPf/);
+  assert.match(html, /KCHAMP/);
   assert.match(html, /kind-program/);
 });
 
@@ -312,7 +312,7 @@ test("ongoing entries form their own first group inside a month-split year, neve
 
 test("an ongoing entry shows 'ongoing' instead of a made-up month", () => {
   const rec = html.slice(html.indexOf('id="record"'), html.indexOf('id="education"'));
-  const k = rec.slice(rec.indexOf("KCHAMPf") - 400, rec.indexOf("KCHAMPf") + 200);
+  const k = rec.slice(rec.indexOf("KCHAMP") - 400, rec.indexOf("KCHAMP") + 200);
   assert.match(k, /진행 중/);
   assert.doesNotMatch(k, /2026\.\d\d/);
 });
@@ -323,4 +323,49 @@ test("validate accepts program entries and rejects a bad ongoing flag", () => {
   const bad = structuredClone(cv);
   bad.record.find((r) => r.ongoing).ongoing = "yes";
   assert.ok(validate(bad).errors.some((e) => e.includes("ongoing")));
+});
+
+// ---- education timeline, KCHAMP details, advisor ----
+test("education shows the enrollment timeline in chronological order", () => {
+  const edu = html.slice(html.indexOf('id="education"'), html.indexOf('id="projects"'));
+  const steps = cv.education[0].steps;
+  assert.ok(steps.length >= 3, "cv.json has the three milestones");
+  let last = -1;
+  for (const s of steps) {
+    const at = edu.indexOf(s.date);
+    assert.ok(at > last, `${s.date} appears after the previous milestone`);
+    last = at;
+  }
+  assert.match(edu, /2023\.03/);
+  assert.match(edu, /2026\.02/);
+  assert.match(edu, /2026\.03/);
+  assert.match(edu, /의예과/);
+  assert.match(edu, /1학년/);
+});
+
+test("the education period shows the start year and that it is ongoing", () => {
+  const edu = html.slice(html.indexOf('id="education"'), html.indexOf('id="projects"'));
+  assert.match(edu, /2023/);
+  assert.doesNotMatch(edu, /class="tbd"/);
+});
+
+test("the program entry carries its full name, spelled KCHAMP (not KCHAMPf), and its period", () => {
+  const rec = html.slice(html.indexOf('id="record"'), html.indexOf('id="education"'));
+  assert.match(rec, /KAIST-충남대 의과대학 의과학자 양성 프로그램/);
+  assert.match(rec, /\(KCHAMP\)/);
+  assert.doesNotMatch(html, /KCHAMPf/);
+  assert.doesNotMatch(JSON.stringify(cv), /KCHAMPf/);
+  assert.match(rec, /졸업/);
+});
+
+test('the faculty advisor 구태윤 is named with "교수님" and no English spelling is invented', () => {
+  assert.match(html, /구태윤 교수님/);
+  assert.doesNotMatch(JSON.stringify(cv), /구태윤 교수(?!님)/);
+  assert.doesNotMatch(html, /Taeyoon|Tae-Yoon|Tae Yoon|Taeyun|Koo\b|Gu Tae/i);
+});
+
+test("the intro mentions the 2023 enrollment and the current year of study", () => {
+  assert.match(cv.person.intro.ko, /2023/);
+  assert.match(cv.person.intro.ko, /의학과 1학년/);
+  assert.match(cv.person.intro.en, /2023/);
 });

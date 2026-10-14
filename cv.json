@@ -22,8 +22,8 @@
       "en": "Chungnam National University College of Medicine"
     },
     "intro": {
-      "ko": "충남대학교 의과대학에 재학 중인 의학도이자 연구자입니다. 프로그래밍과 생물정보학, 뇌과학에 관심이 많고, 2024년 2월부터 2025년 7월까지 조은경 교수님 연구실에서 연구에 참여했습니다. 지금은 연구자가 더 빨리 생각하고 실험할 수 있도록 돕는 연구 도구 INGO 를 만들고 있습니다.",
-      "en": "A medical student and researcher at Chungnam National University College of Medicine. I am interested in programming, bioinformatics and neuroscience, and I took part in research in Prof. Eun-Kyeong Jo's lab from February 2024 to July 2025. Now I am building INGO, a research tool that helps scientists think and experiment faster."
+      "ko": "충남대학교 의과대학에 2023년 입학해 현재 의학과 1학년에 재학 중인 의학도이자 연구자입니다. 프로그래밍과 생물정보학, 뇌과학에 관심이 많고, 2024년 2월부터 2025년 7월까지 조은경 교수님 연구실에서 연구에 참여했습니다. 지금은 연구자가 더 빨리 생각하고 실험할 수 있도록 돕는 연구 도구 INGO 를 만들고 있습니다.",
+      "en": "A medical student and researcher at Chungnam National University College of Medicine: enrolled in 2023 and now in the first year of the medical course. I am interested in programming, bioinformatics and neuroscience, and I took part in research in Prof. Eun-Kyeong Jo's lab from February 2024 to July 2025. Now I am building INGO, a research tool that helps scientists think and experiment faster."
     }
   },
   "record": [
@@ -171,16 +171,16 @@
       "type": "program",
       "ongoing": true,
       "title": {
-        "ko": "KCHAMPf 프로그램 참여",
-        "en": "Participating in KCHAMPf"
+        "ko": "KAIST-충남대 의과대학 의과학자 양성 프로그램 (KCHAMP)",
+        "en": "KAIST–Chungnam National University College of Medicine Physician-Scientist Training Program (KCHAMP)"
       },
       "text": {
-        "ko": "KCHAMPf 프로그램에 참여하고 있습니다.",
-        "en": "Currently taking part in the KCHAMPf program."
+        "ko": "재학 기간 동안 참여합니다. 지도교수님으로 구태윤 교수님을 배정받았습니다.",
+        "en": "Taking part throughout medical school. Assigned Prof. 구태윤 as faculty advisor."
       },
       "period": {
-        "ko": "진행 중",
-        "en": "Ongoing"
+        "ko": "졸업 때까지 계속",
+        "en": "Throughout medical school"
       },
       "selfReported": true
     }
@@ -193,10 +193,36 @@
         "en": "Chungnam National University College of Medicine"
       },
       "degree": {
-        "ko": "의학과 재학",
-        "en": "Medical student (in progress)"
+        "ko": "의학과 1학년 재학 중",
+        "en": "Medical course, year 1 (in progress)"
       },
-      "period": ""
+      "period": {
+        "ko": "2023.03 입학 – 재학 중",
+        "en": "Enrolled Mar 2023 – present"
+      },
+      "steps": [
+        {
+          "date": "2023.03",
+          "text": {
+            "ko": "입학 (의예과)",
+            "en": "Entered the pre-medical course"
+          }
+        },
+        {
+          "date": "2026.02",
+          "text": {
+            "ko": "의예과 수료",
+            "en": "Completed the pre-medical course"
+          }
+        },
+        {
+          "date": "2026.03",
+          "text": {
+            "ko": "의학과 진입 · 현재 1학년",
+            "en": "Entered the medical course · now in year 1"
+          }
+        }
+      ]
     }
   ],
   "projects": [
