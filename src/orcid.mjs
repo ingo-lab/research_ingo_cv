@@ -18,7 +18,8 @@ const numberOf = (s) => {
   return hit ? String(hit["external-id-value"]).trim() : "";
 };
 
-const LENS_ID = /^\d{3}-\d{3}-\d{3}-\d{3}-\d{2}[\dX]$/;
+// 000-000-000-000-00X ids are database ids, not patent office numbers: kept as proof, never shown.
+const INTERNAL_ID = /^\d{3}-\d{3}-\d{3}-\d{3}-\d{2}[\dX]$/;
 
 function toEntry(s) {
   const title = s?.title?.title?.value;
@@ -31,14 +32,15 @@ function toEntry(s) {
   if (!Number.isInteger(year)) return { skip: { title, reason: "no publication year" } };
   const month = Number(s?.["publication-date"]?.month?.value);
   const doi = doiOf(s);
+  // The id ORCID gives for a patent is kept only as proof the work exists; it is not shown (it is not an office number).
   const raw = kind === "patent" ? numberOf(s) : "";
-  // ASSUMPTION: ORCID patent ids shaped 000-000-000-000-00X are Lens.org ids, not patent office numbers.
-  const lensId = LENS_ID.test(raw) ? raw : "";
-  const number = lensId ? "" : raw;
+  const internal = INTERNAL_ID.test(raw);
+  const ref = internal ? raw : "";
+  const number = internal ? "" : raw;
   const url = s?.url?.value && /^https?:\/\//.test(s.url.value) ? s.url.value : "";
-  if (!doi && !number && !lensId && !url) return { skip: { title, reason: "no verifiable identifier (DOI, number or URL)" } };
+  if (!doi && !number && !ref && !url) return { skip: { title, reason: "no verifiable identifier (DOI, number or URL)" } };
   const venue = s?.["journal-title"]?.value ?? "";
-  const entry = { year, ...(month >= 1 && month <= 12 && { month }), type: kind, ...(type === "preprint" && { subtype: "preprint" }), title, ...(lensId && { lensId }), ...(doi && { doi }), ...(number && { number }), ...(url && !doi && { url }), ...(venue && { venue }) };
+  const entry = { year, ...(month >= 1 && month <= 12 && { month }), type: kind, ...(type === "preprint" && { subtype: "preprint" }), title, ...(doi && { doi }), ...(number && { number }), ...(ref && { ref }), ...(url && !doi && { url }), ...(venue && { venue }) };
   return { entry };
 }
 
@@ -61,7 +63,7 @@ export function parseWorks(json) {
 // Plain-text lines for the sync log: exactly what ORCID returned and what was kept or skipped.
 export function describe({ record = [], skipped = [], typeCounts = {} }) {
   const types = Object.entries(typeCounts).map(([k, n]) => `${k}=${n}`).join(", ") || "none";
-  const kept = record.map((r) => `kept ${r.type} ${r.year}${r.month ? `.${String(r.month).padStart(2, "0")}` : ""} "${r.title}" (${r.doi || r.number || r.lensId || r.url})`);
+  const kept = record.map((r) => `kept ${r.type} ${r.year}${r.month ? `.${String(r.month).padStart(2, "0")}` : ""} "${r.title}" (${r.doi || r.number || r.ref || r.url})`);
   const skip = skipped.map((s) => `skipped "${s.title}": ${s.reason}`);
   return [`ORCID types: ${types}`, ...kept, ...skip];
 }

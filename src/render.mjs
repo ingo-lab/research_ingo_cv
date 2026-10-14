@@ -25,7 +25,6 @@ const UI = {
   papers: { ko: "논문", en: "Papers" },
   preprint: { ko: "프리프린트", en: "Preprint" },
   preprints: { ko: "프리프린트", en: "Preprints" },
-  lensId: { ko: "Lens ID", en: "Lens ID" },
   patents: { ko: "특허", en: "Patents" },
   selfReported: { ko: "본인 기재", en: "Self-reported" },
   updated: { ko: "갱신", en: "Updated" },
@@ -74,7 +73,7 @@ export function groupByMonth(items) {
 const MONTHS = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const MONTH_VIEW_MIN = 3; // a year with this many entries or more is split by month
 
-const verifiable = (r) => Boolean(r.doi || r.url || r.number || r.lensId || r.selfReported);
+const verifiable = (r) => Boolean(r.doi || r.url || r.number || r.ref || r.selfReported);
 
 export function validate(cv) {
   const errors = [];
@@ -107,11 +106,11 @@ function authorLine(authors = [], me) {
   return authors.map((a) => (a === me ? `<b class="me">${esc(a)}</b>` : esc(a))).join(", ");
 }
 
-function recordLinks(r) {
+function recordLinks(r, profile) {
   const l = [];
   if (r.doi) l.push(ext(`https://doi.org/${r.doi}`, "DOI"));
   if (r.pmid) l.push(ext(`https://pubmed.ncbi.nlm.nih.gov/${r.pmid}/`, "PubMed"));
-  if (r.lensId) l.push(ext(`https://www.lens.org/lens/patent/${r.lensId}`, "Lens"));
+  if (r.type === "patent" && profile) l.push(ext(profile, "Lens profile"));
   if (r.url) l.push(ext(r.url, "Link"));
   return l.length ? `<p class="links">${l.join("")}</p>` : "";
 }
@@ -121,7 +120,7 @@ const posOf = (r, me) => {
   return i < 0 ? "" : `${i + 1}/${r.authors.length}`;
 };
 
-function recordItem(r, me, all) {
+function recordItem(r, me, all, profile) {
   const when = r.ongoing ? `<span class="when mono">${bi(UI.ongoing)}</span>` : r.month ? `<span class="when mono">${r.year}.${String(r.month).padStart(2, "0")}</span>` : "";
   const review = r.subtype === "review" ? `<span class="kind kind-review">${bi(UI.review)}</span>` : r.subtype === "preprint" ? `<span class="kind kind-review">${bi(UI.preprint)}</span>` : "";
   const kind = `<p class="kinds"><span class="kind kind-${r.type}">${bi(UI[r.type])}</span>${review}${when}</p>`;
@@ -133,7 +132,7 @@ function recordItem(r, me, all) {
       `<p class="venue">${esc(r.venue ?? "")}${pos ? ` · <span class="pos" data-pos="${pos}">${pos.startsWith("1/") ? bi(UI.first) : `${bi(UI.pos)} ${pos}`}</span>` : ""}</p>`;
   }
   if (r.type === "patent") {
-    const bits = [r.number && `<span class="mono">${esc(r.number)}</span>`, r.lensId && `<span class="mono">Lens ID ${esc(r.lensId)}</span>`, r.country && esc(r.country), r.status && esc(r.status)].filter(Boolean);
+    const bits = [r.number && `<span class="mono">${esc(r.number)}</span>`, r.country && esc(r.country), r.status && esc(r.status)].filter(Boolean);
     meta = `${r.inventors?.length ? `<p class="meta">${authorLine(r.inventors, me)}</p>` : ""}<p class="venue">${bits.join(" · ")}</p>`;
   }
   if (r.type === "program") meta = `${r.period ? `<p class="mono period">${bi(r.period)}</p>` : ""}<p class="topic">${bi(r.text)}</p><p class="self">${bi(UI.selfReported)}</p>`;
@@ -144,7 +143,7 @@ function recordItem(r, me, all) {
       (n ? `<p class="venue"><a href="#record" data-lab-papers="${n}">${bi(UI.labPapers)} ${n}</a></p>` : "") +
       `<p class="self">${bi(UI.selfReported)}</p>`;
   }
-  return `<li class="item">${kind}<h4>${title}</h4>${meta}${recordLinks(r)}</li>`;
+  return `<li class="item">${kind}<h4>${title}</h4>${meta}${recordLinks(r, profile)}</li>`;
 }
 
 function counts(record) {
@@ -160,7 +159,7 @@ function counts(record) {
 }
 
 function yearBlock(g, cv) {
-  const list = (items) => `<ul class="items">${items.map((r) => recordItem(r, cv.myName, cv.record)).join("")}</ul>`;
+  const list = (items) => `<ul class="items">${items.map((r) => recordItem(r, cv.myName, cv.record, cv.meta?.patentProfile)).join("")}</ul>`;
   if (g.items.length < MONTH_VIEW_MIN) return list(g.items);
   const label = (m) => (m === ONGOING ? bi(UI.ongoing) : m ? bi({ ko: `${m}월`, en: MONTHS[m] }) : bi(UI.monthUnknown));
   const months = groupByMonth(g.items)
