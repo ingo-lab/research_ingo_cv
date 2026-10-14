@@ -20,6 +20,16 @@
 
 자산 경로는 상대 경로라서 `/research_ingo_cv/` 같은 하위 경로에서도 동작한다(테스트로 고정).
 
+## ORCID 자동 동기화
+`pages.yml` 이 **매일 03:17 UTC**, `main` 에 머지될 때, 그리고 Actions 탭에서 수동 실행할 때 `scripts/sync-orcid.mjs` 를 먼저 돌린다.
+- ORCID 공개 API(`pub.orcid.org/v3.0/<ORCID>/works`)에서 논문 · 특허를 가져오고, 논문은 DOI 로 Europe PMC 에서 저자 · PMID 를 보강한다 → `data/orcid.json`.
+- `cv.json` 의 `record` 에 **같은 DOI 가 이미 있으면 손으로 쓴 쪽이 이긴다**(한 줄 설명 `topic` 등을 지키려고). 없으면 ORCID 항목이 추가된다. 프로젝트 · 연구실은 `cv.json` 에만 있다.
+- DOI · 특허번호 · URL 이 없는 항목, 연도가 없는 항목, 논문/특허가 아닌 유형(데이터셋 등)은 **건너뛰고** 로그에 이유를 남긴다. 확인할 수 없는 것은 보이지 않는다.
+- ORCID 나 네트워크가 실패하면 동기화 단계만 실패하고, 배포는 **이전 데이터로 계속**된다.
+- 푸터에 "ORCID 동기화 YYYY-MM-DD" 가 마지막 성공 날짜로 표시된다.
+- 새 논문이 한 줄 설명 없이 나오는 게 싫으면 `cv.json` 의 `record` 에 같은 DOI 로 `topic` 만 넣어 둔다.
+- 수동 실행: `node scripts/sync-orcid.mjs` (인터넷 필요). 다른 ORCID 는 `ORCID_ID=...` 환경변수.
+
 ## 항목 추가
 논문: `{ "year": 2026, "type": "paper", "title": "...", "authors": ["A B", "Jung B"], "venue": "...", "doi": "10.xxxx/...", "pmid": "...", "topic": {"ko": "한 줄 설명", "en": "One-line topic"} }`
 특허: `{ "year": 2024, "type": "patent", "title": "...", "inventors": ["Jung B"], "number": "10-2024-0000000", "country": "KR", "status": "등록" }`

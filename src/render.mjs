@@ -22,6 +22,7 @@ const UI = {
   patents: { ko: "특허", en: "Patents" },
   selfReported: { ko: "본인 기재", en: "Self-reported" },
   updated: { ko: "갱신", en: "Updated" },
+  synced: { ko: "ORCID 동기화", en: "ORCID sync" },
   theme: { ko: "테마 전환", en: "Toggle theme" },
   skip: { ko: "본문으로", en: "Skip to content" },
 };
@@ -112,7 +113,7 @@ function recordItem(r, me, all) {
   }
   if (r.type === "project") meta = `<p class="topic">${bi(r.text)}</p><p class="self">${bi(UI.selfReported)}</p>`;
   if (r.type === "lab") {
-    const n = r.coauthor ? all.filter((x) => x.type === "paper" && x.authors.includes(r.coauthor)).length : 0;
+    const n = r.coauthor ? all.filter((x) => x.type === "paper" && (x.authors ?? []).includes(r.coauthor)).length : 0;
     meta = `<p class="mono period">${bi(r.period)}</p><p class="topic">${bi(r.text)}</p>` +
       (n ? `<p class="venue"><a href="#record" data-lab-papers="${n}">${bi(UI.labPapers)} ${n}</a></p>` : "") +
       `<p class="self">${bi(UI.selfReported)}</p>`;
@@ -233,7 +234,7 @@ export function renderPage(cv) {
 ${profile(cv)}
 <main class="main">
 ${body(cv)}
-<footer class="foot"><p class="mono">${bi(UI.updated)} ${esc(cv.meta?.updated ?? "")}</p></footer>
+<footer class="foot"><p class="mono">${bi(UI.updated)} ${esc(cv.meta?.updated ?? "")}${cv.meta?.syncedAt ? ` · <span data-synced="${esc(cv.meta.syncedAt)}">${bi(UI.synced)} ${esc(cv.meta.syncedAt)}</span>` : ""}</p></footer>
 </main>
 </div>
 <script src="site.js" defer></script>
