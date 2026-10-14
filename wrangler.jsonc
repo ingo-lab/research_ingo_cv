@@ -1,0 +1,9 @@
+// Cloudflare Worker (static assets only), same pattern as ingo-lab/ingo apps/site (`ingo-home`).
+// Dashboard: Root=repo root · Build=`npm run build` · Deploy=`npx wrangler deploy`.
+{
+  "name": "research-ingo-cv",
+  "compatibility_date": "2026-10-01",
+  "build": { "command": "npm run build" },
+  "assets": { "directory": "./dist", "html_handling": "auto-trailing-slash" },
+  "workers_dev": true
+}
