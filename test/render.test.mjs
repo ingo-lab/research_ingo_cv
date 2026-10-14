@@ -210,7 +210,8 @@ test("a year with three or more entries is shown month by month, newest first", 
   const rec = html.slice(html.indexOf('id="record"'), html.indexOf('id="education"'));
   const y2026 = cv.record.filter((r) => r.year === 2026);
   assert.ok(y2026.length >= 3, "fixture: 2026 has 3+ entries");
-  const months = [...new Set(y2026.map((r) => r.month))].sort((a, b) => b - a);
+  const key = (r) => (r.ongoing ? 13 : r.month ?? 0);
+  const months = [...new Set(y2026.map(key))].sort((a, b) => (a === 0) - (b === 0) || b - a);
   const seen = [...rec.matchAll(/data-month="(\d+)"/g)].map((m) => Number(m[1]));
   assert.deepEqual(seen.slice(0, months.length), months);
 });
@@ -256,4 +257,70 @@ test("the most recent paper (first author) is on the page, with a first-author l
 test("an empty education period renders nothing instead of a placeholder", () => {
   const edu = html.slice(html.indexOf('id="education"'), html.indexOf('id="projects"'));
   assert.doesNotMatch(edu, /class="tbd"/);
+});
+
+// ---- clean, bright look: blue only at the top, no grid pattern ----
+test("the stylesheet has no grid pattern backgrounds", () => {
+  const css = readFileSync(new URL("../public/styles.css", import.meta.url), "utf8");
+  assert.doesNotMatch(css, /background-size:\s*\d+px\s+\d+px/);
+  assert.doesNotMatch(css, /linear-gradient\(\s*var\(--emulsion-faint\)/);
+});
+
+test("the blue name block is at the very top of the left panel, with the intro and links below it", () => {
+  const s = html.slice(html.indexOf("<aside"), html.indexOf("</aside>"));
+  const top = s.indexOf('class="side-top"');
+  const body = s.indexOf('class="side-body"');
+  assert.ok(top >= 0 && body > top, "side-top then side-body");
+  const topHtml = s.slice(top, body);
+  assert.match(topHtml, /<h1>/);
+  assert.doesNotMatch(topHtml, /class="intro"/);
+  const bodyHtml = s.slice(body);
+  for (const k of ['class="intro"', 'class="side-links"', 'class="toc"']) assert.ok(bodyHtml.includes(k), k);
+});
+
+test("the left panel's body is not painted with the brand blue (blue stays at the top)", () => {
+  const css = readFileSync(new URL("../public/styles.css", import.meta.url), "utf8");
+  const rule = /\.side\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
+  assert.doesNotMatch(rule, /var\(--(cyanotype|prussian)\)/);
+});
+
+// ---- honorific + ongoing program ----
+test('Korean text always says "교수님" for the professor (never a bare "교수")', () => {
+  assert.doesNotMatch(JSON.stringify(cv), /조은경 교수(?!님)/);
+  assert.doesNotMatch(html, /조은경 교수(?!님)/);
+  assert.match(html, /조은경 교수님 연구실/);
+});
+
+test("KCHAMPf is listed as a current program, with nothing invented about it", () => {
+  const k = cv.record.find((r) => /KCHAMPf/.test(JSON.stringify(r.title)));
+  assert.ok(k, "cv.json has a KCHAMPf entry");
+  assert.equal(k.type, "program");
+  assert.equal(k.ongoing, true);
+  assert.equal(k.selfReported, true);
+  assert.match(html, /KCHAMPf/);
+  assert.match(html, /kind-program/);
+});
+
+test("ongoing entries form their own first group inside a month-split year, never 'month unknown'", () => {
+  const rec = html.slice(html.indexOf('id="record"'), html.indexOf('id="education"'));
+  const y2026 = rec.slice(rec.indexOf(">2026<"), rec.indexOf(">2025<"));
+  const first = /data-month="(\d+)"/.exec(y2026)?.[1];
+  assert.equal(first, "13");
+  assert.match(y2026, /진행 중/);
+  assert.doesNotMatch(y2026, /월 미상/);
+});
+
+test("an ongoing entry shows 'ongoing' instead of a made-up month", () => {
+  const rec = html.slice(html.indexOf('id="record"'), html.indexOf('id="education"'));
+  const k = rec.slice(rec.indexOf("KCHAMPf") - 400, rec.indexOf("KCHAMPf") + 200);
+  assert.match(k, /진행 중/);
+  assert.doesNotMatch(k, /2026\.\d\d/);
+});
+
+test("validate accepts program entries and rejects a bad ongoing flag", () => {
+  const ok = structuredClone(cv);
+  assert.deepEqual(validate(ok).errors, []);
+  const bad = structuredClone(cv);
+  bad.record.find((r) => r.ongoing).ongoing = "yes";
+  assert.ok(validate(bad).errors.some((e) => e.includes("ongoing")));
 });

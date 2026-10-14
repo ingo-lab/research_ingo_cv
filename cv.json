@@ -128,7 +128,7 @@
       "year": 2024,
       "type": "lab",
       "title": {
-        "ko": "조은경 교수 연구실",
+        "ko": "조은경 교수님 연구실",
         "en": "Lab of Prof. Eun-Kyeong Jo"
       },
       "period": {
@@ -165,6 +165,24 @@
         "ko": "감염 시 미토파지(손상된 미토콘드리아의 선택적 제거)의 역할과 치료적 의미를 정리한 리뷰",
         "en": "Review of the role of mitophagy in infection and its therapeutic implications"
       }
+    },
+    {
+      "year": 2026,
+      "type": "program",
+      "ongoing": true,
+      "title": {
+        "ko": "KCHAMPf 프로그램 참여",
+        "en": "Participating in KCHAMPf"
+      },
+      "text": {
+        "ko": "KCHAMPf 프로그램에 참여하고 있습니다.",
+        "en": "Currently taking part in the KCHAMPf program."
+      },
+      "period": {
+        "ko": "진행 중",
+        "en": "Ongoing"
+      },
+      "selfReported": true
     }
   ],
   "myName": "Jung B",

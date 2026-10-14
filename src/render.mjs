@@ -14,6 +14,8 @@ const UI = {
   patent: { ko: "특허", en: "Patent" },
   project: { ko: "프로젝트", en: "Project" },
   lab: { ko: "연구실", en: "Lab" },
+  program: { ko: "프로그램", en: "Program" },
+  ongoing: { ko: "진행 중", en: "Ongoing" },
   review: { ko: "리뷰", en: "Review" },
   first: { ko: "제1저자", en: "First author" },
   monthUnknown: { ko: "월 미상", en: "Month unknown" },
@@ -29,7 +31,7 @@ const UI = {
   skip: { ko: "본문으로", en: "Skip to content" },
 };
 const SECTIONS = ["record", "education", "projects", "skills", "contact"];
-const KINDS = ["paper", "patent", "project", "lab"];
+const KINDS = ["paper", "patent", "project", "lab", "program"];
 
 export function esc(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -51,16 +53,19 @@ export function emptyPaths(obj, prefix = "") {
   return Object.entries(obj).flatMap(([k, v]) => (k.startsWith("$") ? [] : emptyPaths(v, prefix ? `${prefix}.${k}` : k)));
 }
 
-const byMonthDesc = (a, b) => (b.month ?? 0) - (a.month ?? 0);
+const byMonthDesc = (a, b) => monthKey(b) - monthKey(a);
 
 export function groupByYear(items) {
   const years = [...new Set(items.map((i) => i.year))].sort((a, b) => b - a);
   return years.map((year) => ({ year, items: items.filter((i) => i.year === year).sort(byMonthDesc) }));
 }
 
+const ONGOING = 13; // internal group key: shown first, labelled "ongoing"
+const monthKey = (i) => (i.ongoing ? ONGOING : i.month ?? 0);
+
 export function groupByMonth(items) {
-  const months = [...new Set(items.map((i) => i.month ?? 0))].sort((a, b) => (a === 0) - (b === 0) || b - a);
-  return months.map((month) => ({ month, items: items.filter((i) => (i.month ?? 0) === month) }));
+  const keys = [...new Set(items.map(monthKey))].sort((a, b) => (a === 0) - (b === 0) || b - a);
+  return keys.map((month) => ({ month, items: items.filter((i) => monthKey(i) === month) }));
 }
 
 const MONTHS = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -76,6 +81,7 @@ export function validate(cv) {
   }
   (cv?.record ?? []).forEach((r, i) => {
     if (!Number.isInteger(r.year)) errors.push(`record.${i}.year must be an integer`);
+    if (r.ongoing != null && typeof r.ongoing !== "boolean") errors.push(`record.${i}.ongoing must be true or false`);
     if (r.month != null && !(Number.isInteger(r.month) && r.month >= 1 && r.month <= 12)) errors.push(`record.${i}.month must be 1-12`);
     if (!KINDS.includes(r.type)) errors.push(`record.${i}.type must be one of ${KINDS.join("/")}`);
     if (!verifiable(r)) errors.push(`record.${i} needs doi, url, number, or selfReported`);
@@ -112,7 +118,7 @@ const posOf = (r, me) => {
 };
 
 function recordItem(r, me, all) {
-  const when = r.month ? `<span class="when mono">${r.year}.${String(r.month).padStart(2, "0")}</span>` : "";
+  const when = r.ongoing ? `<span class="when mono">${bi(UI.ongoing)}</span>` : r.month ? `<span class="when mono">${r.year}.${String(r.month).padStart(2, "0")}</span>` : "";
   const review = r.subtype === "review" ? `<span class="kind kind-review">${bi(UI.review)}</span>` : "";
   const kind = `<p class="kinds"><span class="kind kind-${r.type}">${bi(UI[r.type])}</span>${review}${when}</p>`;
   const title = r.type === "paper" || r.type === "patent" ? esc(r.title) : bi(r.title);
@@ -126,6 +132,7 @@ function recordItem(r, me, all) {
     const bits = [r.number && `<span class="mono">${esc(r.number)}</span>`, r.country && esc(r.country), r.status && esc(r.status)].filter(Boolean);
     meta = `${r.inventors?.length ? `<p class="meta">${authorLine(r.inventors, me)}</p>` : ""}<p class="venue">${bits.join(" · ")}</p>`;
   }
+  if (r.type === "program") meta = `<p class="topic">${bi(r.text)}</p><p class="self">${bi(UI.selfReported)}</p>`;
   if (r.type === "project") meta = `<p class="topic">${bi(r.text)}</p><p class="self">${bi(UI.selfReported)}</p>`;
   if (r.type === "lab") {
     const n = r.coauthor ? all.filter((x) => x.type === "paper" && (x.authors ?? []).includes(r.coauthor)).length : 0;
@@ -149,7 +156,7 @@ function counts(record) {
 function yearBlock(g, cv) {
   const list = (items) => `<ul class="items">${items.map((r) => recordItem(r, cv.myName, cv.record)).join("")}</ul>`;
   if (g.items.length < MONTH_VIEW_MIN) return list(g.items);
-  const label = (m) => (m ? bi({ ko: `${m}월`, en: MONTHS[m] }) : bi(UI.monthUnknown));
+  const label = (m) => (m === ONGOING ? bi(UI.ongoing) : m ? bi({ ko: `${m}월`, en: MONTHS[m] }) : bi(UI.monthUnknown));
   const months = groupByMonth(g.items)
     .map((m) => `<li class="month" data-month="${m.month}"><h4 class="mo mono">${label(m.month)}</h4>${list(m.items)}</li>`)
     .join("");
@@ -218,11 +225,13 @@ function profile(cv) {
     <p class="eyebrow">${bi(p.role)}</p>
     <h1>${bi(p.name)}</h1>
     <p class="affil">${bi(p.affiliation)}</p>
-    <p class="intro">${bi(p.intro)}</p>
   </div>
-  ${sideLinks(cv)}
-  ${toc()}
-  ${tools("side-tools")}
+  <div class="side-body">
+    <p class="intro">${bi(p.intro)}</p>
+    ${sideLinks(cv)}
+    ${toc()}
+    ${tools("side-tools")}
+  </div>
 </aside>`;
 }
 
