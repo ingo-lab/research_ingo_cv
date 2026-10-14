@@ -310,3 +310,10 @@ html[data-lang="ko"] [data-l="en"], html[data-lang="en"] [data-l="ko"] { display
   .month { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .mo { text-align: left; padding-top: 0; }
 }
+
+/* education timeline */
+.steps { margin-top: 12px; border-left: 2px solid var(--rule); display: grid; gap: 10px; margin-left: 4px; }
+.steps li { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 8px; align-items: baseline; padding-left: 14px; position: relative; font-size: .93rem; }
+.steps li::before { content: ""; position: absolute; left: -6px; top: .55em; width: 10px; height: 10px; border-radius: 50%; background: var(--paper); border: 2px solid var(--prussian); }
+.steps .mono { color: var(--prussian); font-weight: 600; }
+.edu .period { display: block; margin-top: 2px; }

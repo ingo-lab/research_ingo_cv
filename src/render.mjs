@@ -132,7 +132,7 @@ function recordItem(r, me, all) {
     const bits = [r.number && `<span class="mono">${esc(r.number)}</span>`, r.country && esc(r.country), r.status && esc(r.status)].filter(Boolean);
     meta = `${r.inventors?.length ? `<p class="meta">${authorLine(r.inventors, me)}</p>` : ""}<p class="venue">${bits.join(" · ")}</p>`;
   }
-  if (r.type === "program") meta = `<p class="topic">${bi(r.text)}</p><p class="self">${bi(UI.selfReported)}</p>`;
+  if (r.type === "program") meta = `${r.period ? `<p class="mono period">${bi(r.period)}</p>` : ""}<p class="topic">${bi(r.text)}</p><p class="self">${bi(UI.selfReported)}</p>`;
   if (r.type === "project") meta = `<p class="topic">${bi(r.text)}</p><p class="self">${bi(UI.selfReported)}</p>`;
   if (r.type === "lab") {
     const n = r.coauthor ? all.filter((x) => x.type === "paper" && (x.authors ?? []).includes(r.coauthor)).length : 0;
@@ -171,8 +171,10 @@ function recordSection(cv) {
   return `${counts(cv.record)}<ol class="years">${years}</ol>${note}`;
 }
 
-const eduItem = (e) =>
-  `<li class="edu"><h3>${bi(e.org)}</h3><p>${bi(e.degree)}</p>${e.period ? `<span class="mono period">${bi(e.period)}</span>` : ""}</li>`;
+const eduItem = (e) => {
+  const steps = (e.steps ?? []).map((s) => `<li><span class="mono">${esc(s.date)}</span><span>${bi(s.text)}</span></li>`).join("");
+  return `<li class="edu"><h3>${bi(e.org)}</h3><p>${bi(e.degree)}</p>${e.period ? `<span class="mono period">${bi(e.period)}</span>` : ""}${steps ? `<ol class="steps">${steps}</ol>` : ""}</li>`;
+};
 
 const projectItem = (p) =>
   `<li class="proj"><div class="proj-head"><h3>${esc(p.name)}</h3>${p.period ? `<span class="mono period">${bi(p.period)}</span>` : ""}</div><p>${bi(p.summary)}</p><p class="role mono">${bi(p.role)}</p></li>`;
