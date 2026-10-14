@@ -23,6 +23,8 @@ const UI = {
   pos: { ko: "공저자", en: "Author" },
   labPapers: { ko: "함께한 공동 논문", en: "Co-authored papers with the lab" },
   papers: { ko: "논문", en: "Papers" },
+  preprint: { ko: "프리프린트", en: "Preprint" },
+  preprints: { ko: "프리프린트", en: "Preprints" },
   patents: { ko: "특허", en: "Patents" },
   selfReported: { ko: "본인 기재", en: "Self-reported" },
   updated: { ko: "갱신", en: "Updated" },
@@ -71,7 +73,7 @@ export function groupByMonth(items) {
 const MONTHS = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const MONTH_VIEW_MIN = 3; // a year with this many entries or more is split by month
 
-const verifiable = (r) => Boolean(r.doi || r.url || r.number || r.selfReported);
+const verifiable = (r) => Boolean(r.doi || r.url || r.number || r.lensId || r.selfReported);
 
 export function validate(cv) {
   const errors = [];
@@ -108,6 +110,7 @@ function recordLinks(r) {
   const l = [];
   if (r.doi) l.push(ext(`https://doi.org/${r.doi}`, "DOI"));
   if (r.pmid) l.push(ext(`https://pubmed.ncbi.nlm.nih.gov/${r.pmid}/`, "PubMed"));
+  if (r.lensId) l.push(ext(`https://www.lens.org/lens/patent/${r.lensId}`, "Lens"));
   if (r.url) l.push(ext(r.url, "Link"));
   return l.length ? `<p class="links">${l.join("")}</p>` : "";
 }
@@ -119,7 +122,7 @@ const posOf = (r, me) => {
 
 function recordItem(r, me, all) {
   const when = r.ongoing ? `<span class="when mono">${bi(UI.ongoing)}</span>` : r.month ? `<span class="when mono">${r.year}.${String(r.month).padStart(2, "0")}</span>` : "";
-  const review = r.subtype === "review" ? `<span class="kind kind-review">${bi(UI.review)}</span>` : "";
+  const review = r.subtype === "review" ? `<span class="kind kind-review">${bi(UI.review)}</span>` : r.subtype === "preprint" ? `<span class="kind kind-review">${bi(UI.preprint)}</span>` : "";
   const kind = `<p class="kinds"><span class="kind kind-${r.type}">${bi(UI[r.type])}</span>${review}${when}</p>`;
   const title = r.type === "paper" || r.type === "patent" ? esc(r.title) : bi(r.title);
   let meta = "";
@@ -147,7 +150,9 @@ function counts(record) {
   const n = (t) => record.filter((r) => r.type === t).length;
   const years = record.map((r) => r.year);
   const cell = (key, v) => `<li><b data-count="${key}" data-to="${v}">${v}</b><span>${bi(UI[key])}</span></li>`;
-  const cells = [cell("papers", n("paper"))];
+  const pre = record.filter((r) => r.type === "paper" && r.subtype === "preprint").length;
+  const cells = [cell("papers", n("paper") - pre)];
+  if (pre) cells.push(cell("preprints", pre));
   if (n("patent")) cells.push(cell("patents", n("patent")));
   const span = years.length ? `${Math.min(...years)}–${Math.max(...years)}` : "";
   return `<ul class="counts">${cells.join("")}${span ? `<li><b>${esc(span)}</b><span>${bi({ ko: "기간", en: "Years" })}</span></li>` : ""}</ul>`;

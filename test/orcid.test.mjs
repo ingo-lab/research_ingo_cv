@@ -121,3 +121,25 @@ test("describe lists every kept and skipped work so a sync log shows exactly wha
   assert.match(text, /kept paper 2026 .*New cohort paper.*10\.1000\/new\.1/);
   assert.match(text, /skipped .*No proof at all.*identifier/);
 });
+
+test("Lens-shaped patent ids link to Lens, other ids stay plain numbers, Lens profile is in Contact, preprints are marked", () => {
+  const w = (o) => ({ "work-summary": [summary(o)] });
+  const { record } = parseWorks({
+    group: [
+      w({ putCode: 1, title: "Lens patent", type: "PATENT", year: 2025, ids: [{ "external-id-type": "other-id", "external-id-value": "133-544-147-073-270" }] }),
+      w({ putCode: 3, title: "Office patent", type: "PATENT", year: 2025, ids: [{ "external-id-type": "other-id", "external-id-value": "KR 10-2025-0001" }] }),
+      w({ putCode: 2, title: "A preprint", type: "PREPRINT", year: 2026, ids: [{ "external-id-type": "doi", "external-id-value": "10.21203/rs.3.rs-1/v1" }] }),
+    ],
+  });
+  assert.equal(record[0].lensId, "133-544-147-073-270");
+  assert.equal(record[1].number, "KR 10-2025-0001");
+  assert.equal(record[2].subtype, "preprint");
+  const page = renderPage({ ...cv, record: [...cv.record, ...record.map((r) => ({ ...r, authors: ["Jung B"], venue: "" }))] });
+  const card = (t) => { const a = page.slice(page.indexOf(t)); return a.slice(0, a.indexOf("</li>")); };
+  assert.ok(card("Lens patent").includes('href="https://www.lens.org/lens/patent/133-544-147-073-270"'));
+  assert.ok(!card("Office patent").includes("<a "));
+  assert.ok(card("Office patent").includes("KR 10-2025-0001"));
+  const at = page.indexOf('id="contact"');
+  assert.ok(page.slice(at).includes('href="https://link.lens.org/iKq9HjWBeUd"'));
+  assert.match(page, /data-count="preprints" data-to="1"/);
+});

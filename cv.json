@@ -175,8 +175,8 @@
         "en": "KAIST–Chungnam National University College of Medicine Physician-Scientist Training Program (KCHAMP)"
       },
       "text": {
-        "ko": "재학 기간 동안 참여합니다. 지도교수님으로 구태윤 교수님을 배정받았습니다.",
-        "en": "Taking part throughout medical school. Assigned Prof. 구태윤 as faculty advisor."
+        "ko": "지도교수: 구태윤 교수님 (KAIST)",
+        "en": "Advisor: Prof. 구태윤 (KAIST)"
       },
       "selfReported": true
     }
@@ -349,6 +349,12 @@
       "label": "Web of Science ResearcherID",
       "value": "RHD-7236-2026",
       "url": "https://www.webofscience.com/wos/author/record/RHD-7236-2026"
+    },
+    {
+      "id": "lens",
+      "label": "Lens",
+      "value": "link.lens.org/iKq9HjWBeUd",
+      "url": "https://link.lens.org/iKq9HjWBeUd"
     }
   ],
   "contact": {
