@@ -442,8 +442,26 @@ test("assets get a version query when a version is given, so a new deploy never 
   assert.doesNotMatch(renderPage(cv), /\?v=/);
 });
 
-test("the build stamps the assets with a content hash", () => {
-  const out = readFileSync(new URL("../dist/index.html", import.meta.url), "utf8");
-  assert.match(out, /styles\.css\?v=[0-9a-f]{8,}/);
-  assert.match(out, /site\.js\?v=[0-9a-f]{8,}/);
+test("the asset version is a content hash: stable for the same files, different when a file changes", async () => {
+  const { assetVersion } = await import("../src/assets.mjs");
+  const { mkdtempSync, writeFileSync, mkdirSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { pathToFileURL } = await import("node:url");
+  const dir = mkdtempSync(`${tmpdir()}/cv-assets-`);
+  mkdirSync(`${dir}/public`);
+  writeFileSync(`${dir}/public/styles.css`, "a{}");
+  writeFileSync(`${dir}/public/site.js`, "1");
+  const root = pathToFileURL(`${dir}/`);
+  const v1 = assetVersion(root);
+  assert.match(v1, /^[0-9a-f]{10}$/);
+  assert.equal(assetVersion(root), v1);
+  writeFileSync(`${dir}/public/styles.css`, "a{color:red}");
+  assert.notEqual(assetVersion(root), v1);
+  assert.match(assetVersion(new URL("../", import.meta.url)), /^[0-9a-f]{10}$/);
+});
+
+test("build.mjs stamps the page with that version", () => {
+  const src = readFileSync(new URL("../build.mjs", import.meta.url), "utf8");
+  assert.match(src, /assetVersion\(/);
+  assert.match(src, /renderPage\(cv,\s*\{\s*assetVersion:\s*version\s*\}\)/);
 });
