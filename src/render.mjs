@@ -5,7 +5,6 @@ const HTTP = /^https?:\/\//;
 const EMAIL = /^[^\s@<>"]+@[^\s@<>"]+\.[a-z]{2,}$/i;
 const TBD = { ko: "준비 중", en: "Coming soon" };
 const UI = {
-  about: { ko: "소개", en: "About" },
   record: { ko: "연구실적", en: "Research record" },
   education: { ko: "학력", en: "Education" },
   projects: { ko: "프로젝트", en: "Projects" },
@@ -15,6 +14,9 @@ const UI = {
   patent: { ko: "특허", en: "Patent" },
   project: { ko: "프로젝트", en: "Project" },
   lab: { ko: "연구실", en: "Lab" },
+  review: { ko: "리뷰", en: "Review" },
+  first: { ko: "제1저자", en: "First author" },
+  monthUnknown: { ko: "월 미상", en: "Month unknown" },
   toc: { ko: "목차", en: "Contents" },
   pos: { ko: "공저자", en: "Author" },
   labPapers: { ko: "함께한 공동 논문", en: "Co-authored papers with the lab" },
@@ -26,7 +28,7 @@ const UI = {
   theme: { ko: "테마 전환", en: "Toggle theme" },
   skip: { ko: "본문으로", en: "Skip to content" },
 };
-const SECTIONS = ["about", "record", "education", "projects", "skills", "contact"];
+const SECTIONS = ["record", "education", "projects", "skills", "contact"];
 const KINDS = ["paper", "patent", "project", "lab"];
 
 export function esc(s) {
@@ -49,10 +51,20 @@ export function emptyPaths(obj, prefix = "") {
   return Object.entries(obj).flatMap(([k, v]) => (k.startsWith("$") ? [] : emptyPaths(v, prefix ? `${prefix}.${k}` : k)));
 }
 
+const byMonthDesc = (a, b) => (b.month ?? 0) - (a.month ?? 0);
+
 export function groupByYear(items) {
   const years = [...new Set(items.map((i) => i.year))].sort((a, b) => b - a);
-  return years.map((year) => ({ year, items: items.filter((i) => i.year === year) }));
+  return years.map((year) => ({ year, items: items.filter((i) => i.year === year).sort(byMonthDesc) }));
 }
+
+export function groupByMonth(items) {
+  const months = [...new Set(items.map((i) => i.month ?? 0))].sort((a, b) => (a === 0) - (b === 0) || b - a);
+  return months.map((month) => ({ month, items: items.filter((i) => (i.month ?? 0) === month) }));
+}
+
+const MONTHS = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTH_VIEW_MIN = 3; // a year with this many entries or more is split by month
 
 const verifiable = (r) => Boolean(r.doi || r.url || r.number || r.selfReported);
 
@@ -64,6 +76,7 @@ export function validate(cv) {
   }
   (cv?.record ?? []).forEach((r, i) => {
     if (!Number.isInteger(r.year)) errors.push(`record.${i}.year must be an integer`);
+    if (r.month != null && !(Number.isInteger(r.month) && r.month >= 1 && r.month <= 12)) errors.push(`record.${i}.month must be 1-12`);
     if (!KINDS.includes(r.type)) errors.push(`record.${i}.type must be one of ${KINDS.join("/")}`);
     if (!verifiable(r)) errors.push(`record.${i} needs doi, url, number, or selfReported`);
     if (r.url && !HTTP.test(r.url)) errors.push(`record.${i}.url must be http(s)`);
@@ -99,13 +112,15 @@ const posOf = (r, me) => {
 };
 
 function recordItem(r, me, all) {
-  const kind = `<span class="kind kind-${r.type}">${bi(UI[r.type])}</span>`;
+  const when = r.month ? `<span class="when mono">${r.year}.${String(r.month).padStart(2, "0")}</span>` : "";
+  const review = r.subtype === "review" ? `<span class="kind kind-review">${bi(UI.review)}</span>` : "";
+  const kind = `<p class="kinds"><span class="kind kind-${r.type}">${bi(UI[r.type])}</span>${review}${when}</p>`;
   const title = r.type === "paper" || r.type === "patent" ? esc(r.title) : bi(r.title);
   let meta = "";
   if (r.type === "paper") {
     const pos = posOf(r, me);
     meta = `${r.topic ? `<p class="topic">${bi(r.topic)}</p>` : ""}<p class="meta">${authorLine(r.authors, me)}</p>` +
-      `<p class="venue">${esc(r.venue ?? "")}${pos ? ` · <span class="pos" data-pos="${pos}">${bi(UI.pos)} ${pos}</span>` : ""}</p>`;
+      `<p class="venue">${esc(r.venue ?? "")}${pos ? ` · <span class="pos" data-pos="${pos}">${pos.startsWith("1/") ? bi(UI.first) : `${bi(UI.pos)} ${pos}`}</span>` : ""}</p>`;
   }
   if (r.type === "patent") {
     const bits = [r.number && `<span class="mono">${esc(r.number)}</span>`, r.country && esc(r.country), r.status && esc(r.status)].filter(Boolean);
@@ -131,16 +146,26 @@ function counts(record) {
   return `<ul class="counts">${cells.join("")}${span ? `<li><b>${esc(span)}</b><span>${bi({ ko: "기간", en: "Years" })}</span></li>` : ""}</ul>`;
 }
 
+function yearBlock(g, cv) {
+  const list = (items) => `<ul class="items">${items.map((r) => recordItem(r, cv.myName, cv.record)).join("")}</ul>`;
+  if (g.items.length < MONTH_VIEW_MIN) return list(g.items);
+  const label = (m) => (m ? bi({ ko: `${m}월`, en: MONTHS[m] }) : bi(UI.monthUnknown));
+  const months = groupByMonth(g.items)
+    .map((m) => `<li class="month" data-month="${m.month}"><h4 class="mo mono">${label(m.month)}</h4>${list(m.items)}</li>`)
+    .join("");
+  return `<ol class="months">${months}</ol>`;
+}
+
 function recordSection(cv) {
   const years = groupByYear(cv.record)
-    .map((g) => `<li class="year"><h3 class="yr">${g.year}</h3><ul class="items">${g.items.map((r) => recordItem(r, cv.myName, cv.record)).join("")}</ul></li>`)
+    .map((g) => `<li class="year"><h3 class="yr">${g.year}</h3>${yearBlock(g, cv)}</li>`)
     .join("");
   const note = cv.meta?.recordSource ? `<p class="note">${bi(cv.meta.recordSource)}</p>` : "";
   return `${counts(cv.record)}<ol class="years">${years}</ol>${note}`;
 }
 
 const eduItem = (e) =>
-  `<li class="edu"><h3>${bi(e.org)}</h3><p>${bi(e.degree)}</p><span class="mono period">${bi(e.period)}</span></li>`;
+  `<li class="edu"><h3>${bi(e.org)}</h3><p>${bi(e.degree)}</p>${e.period ? `<span class="mono period">${bi(e.period)}</span>` : ""}</li>`;
 
 const projectItem = (p) =>
   `<li class="proj"><div class="proj-head"><h3>${esc(p.name)}</h3>${p.period ? `<span class="mono period">${bi(p.period)}</span>` : ""}</div><p>${bi(p.summary)}</p><p class="role mono">${bi(p.role)}</p></li>`;
@@ -161,37 +186,50 @@ function allLinks(cv) {
   return [...ids, ...mails, ...gh].join("");
 }
 
-function pills(cv) {
-  const orcid = (cv.identifiers ?? []).find((x) => x.id === "orcid");
-  const wos = (cv.identifiers ?? []).find((x) => x.id === "wos");
-  const mail = cv.contact?.emails?.[0];
-  const items = [orcid && ["ORCID", orcid.url], wos && ["WoS", wos.url], cv.contact?.github && ["GitHub", cv.contact.github], mail && ["Email", `mailto:${mail}`]].filter(Boolean);
-  return `<ul class="pills">${items.map(([l, h]) => `<li><a href="${esc(h)}" rel="noopener">${l}</a></li>`).join("")}</ul>`;
+function sideLinks(cv) {
+  const row = (label, text, href) => `<li><span class="mono">${esc(label)}</span><a href="${esc(href)}" rel="noopener">${esc(text)}</a></li>`;
+  const byId = (id) => (cv.identifiers ?? []).find((x) => x.id === id);
+  const orcid = byId("orcid");
+  const wos = byId("wos");
+  const rows = [
+    orcid && row("ORCID", orcid.value, orcid.url),
+    wos && row("WoS", wos.value, wos.url),
+    cv.contact?.github && row("GitHub", cv.contact.github.replace(HTTP, ""), cv.contact.github),
+    ...(cv.contact?.emails ?? []).map((e) => row("Email", e, `mailto:${e}`)),
+  ].filter(Boolean);
+  return `<ul class="side-links">${rows.join("")}</ul>`;
 }
 
 function toc() {
   const items = SECTIONS.map((s, i) => `<li><a href="#${s}"><span class="mono">${String(i + 1).padStart(2, "0")}</span>${bi(UI[s])}</a></li>`).join("");
-  return `<nav class="toc" aria-label="${esc(plain(UI.toc))}"><p class="toc-title mono">${bi(UI.toc)}</p><ol>${items}</ol></nav>`;
+  return `<nav class="toc" aria-label="${esc(plain(UI.toc))}"><ol>${items}</ol></nav>`;
 }
+
+const tools = (cls) => `<div class="tools ${cls}">
+    <button type="button" class="lang" data-action="lang" aria-label="Language">KO / EN</button>
+    <button type="button" class="theme" data-action="theme" aria-label="${esc(plain(UI.theme))}">◐</button>
+  </div>`;
 
 function profile(cv) {
   const p = cv.person;
-  return `<aside class="side" id="top"><div class="profile">
-  <div class="profile-head">
+  return `<aside class="side" id="top">
+  <div class="side-top">
     <div class="mono-badge" aria-hidden="true">${esc(monogram(p.name))}</div>
     <p class="eyebrow">${bi(p.role)}</p>
     <h1>${bi(p.name)}</h1>
     <p class="affil">${bi(p.affiliation)}</p>
+    <p class="intro">${bi(p.intro)}</p>
   </div>
-  <div class="profile-body"><p class="tagline">${bi(p.tagline)}</p>${pills(cv)}</div>
-</div>${toc()}</aside>`;
+  ${sideLinks(cv)}
+  ${toc()}
+  ${tools("side-tools")}
+</aside>`;
 }
 
 function body(cv) {
   const wrap = (id, inner) =>
     `<section id="${id}" class="sec reveal"><header class="sec-head"><h2>${bi(UI[id])}</h2></header>${inner}</section>`;
   return [
-    wrap("about", `<p class="lead">${bi(cv.about)}</p>`),
     wrap("record", recordSection(cv)),
     wrap("education", `<ul class="edus">${cv.education.map(eduItem).join("")}</ul>`),
     wrap("projects", `<ul class="projs">${cv.projects.map(projectItem).join("")}</ul>`),
@@ -201,8 +239,7 @@ function body(cv) {
 }
 
 const nav = () =>
-  `<nav class="nav" aria-label="Sections"><ul>${SECTIONS.filter((s) => s !== "contact")
-    .map((s) => `<li><a href="#${s}">${bi(UI[s])}</a></li>`).join("")}<li><a href="#contact">${bi(UI.contact)}</a></li></ul></nav>`;
+  `<nav class="nav" aria-label="Sections"><ul>${SECTIONS.map((s) => `<li><a href="#${s}">${bi(UI[s])}</a></li>`).join("")}</ul></nav>`;
 
 export function renderPage(cv) {
   const title = `${plain(cv.person.name)} · ${plain(cv.person.affiliation)}`;
@@ -212,25 +249,22 @@ export function renderPage(cv) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
-<meta name="description" content="${esc(plain(cv.person.tagline))}">
+<meta name="description" content="${esc(plain(cv.person.intro))}">
 <meta property="og:title" content="${esc(title)}">
-<meta property="og:description" content="${esc(plain(cv.person.tagline, "en"))}">
+<meta property="og:description" content="${esc(plain(cv.person.intro, "en"))}">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preload" href="fonts/pretendard-variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
 <script>try{var t=localStorage.getItem("cv-theme");if(t)document.documentElement.dataset.theme=t;var l=localStorage.getItem("cv-lang");if(l){document.documentElement.dataset.lang=l;document.documentElement.lang=l}}catch(e){}</script>
 </head>
 <body>
-<a class="skip" href="#about">${bi(UI.skip)}</a>
+<a class="skip" href="#record">${bi(UI.skip)}</a>
 <div class="topbar"><div class="topbar-in">
   <a class="brand" href="#top" aria-label="Top"><img src="favicon.svg" alt="" width="20" height="20"><span class="mono">CV</span></a>
   ${nav()}
-  <div class="tools">
-    <button type="button" class="lang" data-action="lang" aria-label="Language">KO / EN</button>
-    <button type="button" class="theme" data-action="theme" aria-label="${esc(plain(UI.theme))}">◐</button>
-  </div>
+  ${tools("top-tools")}
 </div></div>
-<div class="page">
+<div class="shell">
 ${profile(cv)}
 <main class="main">
 ${body(cv)}

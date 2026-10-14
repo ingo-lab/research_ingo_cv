@@ -21,14 +21,10 @@
       "ko": "충남대학교 의과대학",
       "en": "Chungnam National University College of Medicine"
     },
-    "tagline": {
-      "ko": "의학과 생물정보학, 뇌과학, 프로그래밍 사이에서 연구하고 도구를 만듭니다.",
-      "en": "Research and tool-building across medicine, bioinformatics, neuroscience and programming."
+    "intro": {
+      "ko": "충남대학교 의과대학에 재학 중인 의학도이자 연구자입니다. 프로그래밍과 생물정보학, 뇌과학에 관심이 많고, 2024년 2월부터 2025년 7월까지 조은경 교수님 연구실에서 연구에 참여했습니다. 지금은 연구자가 더 빨리 생각하고 실험할 수 있도록 돕는 연구 도구 INGO 를 만들고 있습니다.",
+      "en": "A medical student and researcher at Chungnam National University College of Medicine. I am interested in programming, bioinformatics and neuroscience, and I took part in research in Prof. Eun-Kyeong Jo's lab from February 2024 to July 2025. Now I am building INGO, a research tool that helps scientists think and experiment faster."
     }
-  },
-  "about": {
-    "ko": "충남대학교 의과대학에 재학 중인 연구자입니다. 프로그래밍 · 생물정보학 · 뇌과학에 관심이 많고, 연구자가 더 빨리 생각하고 실험할 수 있도록 돕는 연구 도구를 기획 · 디자인 · 개발하고 있습니다.",
-    "en": "A researcher and medical student at Chungnam National University. Interested in programming, bioinformatics and neuroscience; I plan, design and build research tools that help scientists think and experiment faster."
   },
   "record": [
     {
@@ -55,7 +51,8 @@
       "topic": {
         "ko": "결핵균 감염 시 메틸 자스모네이트가 오토파지를 활성화해 숙주 방어를 높임을 보인 연구",
         "en": "Methyl jasmonate boosts host defense against M. tuberculosis by activating autophagy"
-      }
+      },
+      "month": 2
     },
     {
       "year": 2026,
@@ -87,7 +84,8 @@
       "topic": {
         "ko": "ERRα 를 표적으로 암 성장을 억제하는 새로운 화합물(PAMT-001)을 설계 · 평가한 연구",
         "en": "Design and evaluation of PAMT-001, an ERRα-targeting compound that suppresses tumorigenesis"
-      }
+      },
+      "month": 3
     },
     {
       "year": 2026,
@@ -100,7 +98,8 @@
         "ko": "연구실의 일을 한곳에서 하는 연구실 작업대를 기획 · 디자인 · 개발하기 시작했습니다.",
         "en": "Began planning, designing and building a lab workbench that brings a lab's daily work into one place."
       },
-      "selfReported": true
+      "selfReported": true,
+      "month": 9
     },
     {
       "year": 2025,
@@ -121,7 +120,9 @@
       "topic": {
         "ko": "암에서 인플라마좀과 파이롭토시스의 작용 기전과 치료 전략의 최근 진전을 정리한 논문",
         "en": "Overview of inflammasome and pyroptosis mechanisms and therapeutic advances in cancer"
-      }
+      },
+      "month": 11,
+      "subtype": "review"
     },
     {
       "year": 2024,
@@ -139,7 +140,31 @@
         "en": "Member of the lab, taking part in its research."
       },
       "coauthor": "Jo EK",
-      "selfReported": true
+      "selfReported": true,
+      "month": 2
+    },
+    {
+      "year": 2026,
+      "month": 10,
+      "type": "paper",
+      "subtype": "review",
+      "title": "Mitophagy in pathogenesis and therapeutic implications for infection.",
+      "authors": [
+        "Jung B",
+        "Lee B",
+        "Sapkota A",
+        "Roh T",
+        "Seo W",
+        "Kim JK",
+        "Jo EK"
+      ],
+      "venue": "Experimental & Molecular Medicine",
+      "doi": "10.1038/s12276-026-01852-7",
+      "pmid": "42834108",
+      "topic": {
+        "ko": "감염 시 미토파지(손상된 미토콘드리아의 선택적 제거)의 역할과 치료적 의미를 정리한 리뷰",
+        "en": "Review of the role of mitophagy in infection and its therapeutic implications"
+      }
     }
   ],
   "myName": "Jung B",

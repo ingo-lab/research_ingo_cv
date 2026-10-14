@@ -27,12 +27,13 @@ function toEntry(s) {
   const kind = type === "patent" ? "patent" : PAPER_TYPES.has(type) ? "paper" : "";
   if (!kind) return { skip: { title, reason: `type "${type}" is not shown` } };
   if (!Number.isInteger(year)) return { skip: { title, reason: "no publication year" } };
+  const month = Number(s?.["publication-date"]?.month?.value);
   const doi = doiOf(s);
   const number = kind === "patent" ? numberOf(s) : "";
   const url = s?.url?.value && /^https?:\/\//.test(s.url.value) ? s.url.value : "";
   if (!doi && !number && !url) return { skip: { title, reason: "no verifiable identifier (DOI, number or URL)" } };
   const venue = s?.["journal-title"]?.value ?? "";
-  const entry = { year, type: kind, title, ...(doi && { doi }), ...(number && { number }), ...(url && !doi && { url }), ...(venue && { venue }) };
+  const entry = { year, ...(month >= 1 && month <= 12 && { month }), type: kind, title, ...(doi && { doi }), ...(number && { number }), ...(url && !doi && { url }), ...(venue && { venue }) };
   return { entry };
 }
 
@@ -52,8 +53,10 @@ export function parseWorks(json) {
 export function parseEpmc(json) {
   const r = json?.resultList?.result?.[0];
   if (!r) return {};
+  const m = /^\d{4}-(\d{2})/.exec(r.firstPublicationDate ?? "");
+  const month = m ? Number(m[1]) : 0;
   const authors = String(r.authorString ?? "").replace(/\.$/, "").split(/,\s*/).filter(Boolean);
-  return { ...(authors.length && { authors }), ...(r.pmid && { pmid: String(r.pmid) }), ...(r.journalTitle && { venue: r.journalTitle }) };
+  return { ...(month >= 1 && month <= 12 && { month }), ...(authors.length && { authors }), ...(r.pmid && { pmid: String(r.pmid) }), ...(r.journalTitle && { venue: r.journalTitle }) };
 }
 
 export function mergeRecord(cv, synced) {
