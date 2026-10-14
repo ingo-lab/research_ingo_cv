@@ -73,7 +73,7 @@ export function groupByMonth(items) {
 const MONTHS = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const MONTH_VIEW_MIN = 3; // a year with this many entries or more is split by month
 
-const verifiable = (r) => Boolean(r.doi || r.url || r.number || r.selfReported);
+const verifiable = (r) => Boolean(r.doi || r.url || r.number || r.lensId || r.selfReported);
 
 export function validate(cv) {
   const errors = [];
@@ -110,6 +110,7 @@ function recordLinks(r) {
   const l = [];
   if (r.doi) l.push(ext(`https://doi.org/${r.doi}`, "DOI"));
   if (r.pmid) l.push(ext(`https://pubmed.ncbi.nlm.nih.gov/${r.pmid}/`, "PubMed"));
+  if (r.lensId) l.push(ext(`https://www.lens.org/lens/patent/${r.lensId}`, "Lens"));
   if (r.url) l.push(ext(r.url, "Link"));
   return l.length ? `<p class="links">${l.join("")}</p>` : "";
 }
