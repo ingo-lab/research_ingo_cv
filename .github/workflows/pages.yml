@@ -1,9 +1,12 @@
-# Build cv.json -> dist/ and publish to GitHub Pages on every push to main.
+# Build cv.json (+ works synced from ORCID) -> dist/ and publish to GitHub Pages.
+# Runs on every push to main, every day (ORCID sync), and on demand (Actions tab → Run workflow).
 # One-time setup: repo Settings → Pages → Build and deployment → Source = "GitHub Actions".
 name: pages
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: "17 3 * * *"   # daily 03:17 UTC (12:17 KST)
   workflow_dispatch:
 permissions:
   contents: read
@@ -20,6 +23,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Sync works from ORCID (keeps the previous data if ORCID or the network fails)
+        continue-on-error: true
+        run: node scripts/sync-orcid.mjs
       - run: npm test
       - run: npm run build
       - run: touch dist/.nojekyll
