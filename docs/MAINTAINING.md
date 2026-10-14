@@ -14,7 +14,7 @@ Bokeum Jung 의 연구자 CV 사이트. 연구실적을 연도별(많은 해는 
 |---|---|
 | 이름 · 역할 · 소속 · **맨 위 파란 영역의 소개 글** | `person` (`intro` 가 소개 글) |
 | 논문 · 특허 · 프로젝트 · 연구실 경험 | `record[]` (아래 「연구실적 항목」) |
-| 학력(입학 · 진급 시점) | `education[]` — `period` 와 `steps[]`(날짜 + 문구)로 입학 · 수료 · 진입을 시간순으로 보여 준다. `period` 를 비워 두면 그 줄은 화면에 안 나온다 |
+| 학력(입학 · 진급 시점) | `education[]` — `period` 와 `steps[]`(날짜 + 문구)로 입학 · 수료 · 진입을 시간순으로 보여 준다. `period` 를 비워 두면 그 줄은 화면에 안 나온다. 문구 안의 `{year}` 는 `medicalFrom`(의학과 진입 `YYYY-MM`)에서 학년으로 자동 계산된다(매년 3월에 올라가고 `medicalYears` 에서 멈춤 · 매일 빌드로 갱신) |
 | 프로젝트 소개 | `projects[]` (짧은 요약만 — 아래 「공개 범위」) |
 | 관심 분야 · 기술 | `interests[]` · `skills[]` |
 | ORCID · WoS · GitHub · 이메일 | `identifiers[]` · `contact` — 화면에는 맨 아래 **Contact** 섹션에만 나온다 |
