@@ -12,12 +12,18 @@
 | 배포(대안) | Cloudflare Workers assets — `npm run deploy` (`wrangler.jsonc`) |
 
 ## 구조
-- `src/render.mjs` — `cv.json` → HTML 로 바꾸는 순수 함수(`esc` · `bi` · `validate` · `renderPage`). 두 언어를 모두 HTML 에 넣고 CSS(`html[data-lang]`)로 하나만 보여 준다.
-- `public/styles.css` — 맨 위 토큰 블록은 INGO v10 에서 **그대로 복사**(prussian · cyanotype · bridge · collision · deadline, Pretendard · Source Serif 4 · JetBrains Mono · Nanum Pen Script). 그 아래가 CV 컴포넌트.
-- `public/site.js` — 테마 · 언어 전환, 스크롤 등장, 현재 섹션 표시. JS 없이도 내용은 다 보이고, "동작 줄이기" 설정이면 움직이지 않는다.
-- `public/fonts/` — INGO 소개 사이트와 같은 woff2(OFL).
+- `cv.json` — 내용 원본. `record[]` 가 연도별 연구실적(논문 · 특허 · 프로젝트 · 연구실). 항목마다 `year`(정수) · `type`(`paper|patent|project|lab`)이 필수이고, `doi` / `url` / `number` 중 하나 또는 `selfReported: true` 가 있어야 빌드가 통과한다.
+- `src/render.mjs` — `cv.json` → HTML 순수 함수. 두 언어를 모두 넣고 CSS(`html[data-lang]`)로 하나만 보여 준다. 저자 순서(`공저자 5/12`)와 연구실 공동 논문 수는 데이터에서 계산한다.
+- `public/styles.css` — 맨 위 토큰 블록은 INGO v10 에서 **그대로 복사**. 그 아래가 왼쪽 고정 프로필 + 목차, 연도별 타임라인 컴포넌트.
+- `public/site.js` — 테마 · 언어 전환, 목차 현재 위치 표시, 스크롤 등장, 숫자 올라가기. JS 없이도 내용은 다 보이고, "동작 줄이기" 설정이면 움직이지 않는다.
+- `public/fonts/` — woff2(OFL).
 
-자산 경로(`styles.css` · `fonts/` · `site.js`)는 상대 경로라서 `/research_ingo_cv/` 같은 하위 경로에서도 그대로 동작한다(테스트로 고정).
+자산 경로는 상대 경로라서 `/research_ingo_cv/` 같은 하위 경로에서도 동작한다(테스트로 고정).
+
+## 항목 추가
+논문: `{ "year": 2026, "type": "paper", "title": "...", "authors": ["A B", "Jung B"], "venue": "...", "doi": "10.xxxx/...", "pmid": "...", "topic": {"ko": "한 줄 설명", "en": "One-line topic"} }`
+특허: `{ "year": 2024, "type": "patent", "title": "...", "inventors": ["Jung B"], "number": "10-2024-0000000", "country": "KR", "status": "등록" }`
+`myName`(`Jung B`)과 같은 저자 이름은 자동으로 강조된다.
 
 ## 내용 규칙 (INGO AGENTS.md §6 에서 가져옴)
 - 사실만 쓴다. 날짜 · 수치(`stats`, `timeline`)에는 `source` 가 필수이고, 없으면 빌드가 실패한다.
@@ -26,5 +32,4 @@
 
 ## 채워야 할 칸
 `npm run build` 경고 목록이 정본이다. 지금: 학년/기간(`education.0.period`).
-논문은 연구자 ID(`identifiers`: ORCID · Web of Science ResearcherID)로 연결한다. 개별 항목을 직접 보이고 싶으면 `publications` 에
-`{ "year": 2026, "title": "...", "venue": "...", "url": "https://..." }` 모양으로 넣는다(원문에서 확인한 것만).
+ORCID 에는 논문 6편 · 특허 3건이 있다고 하나, 번호로 확인된 3편만 넣었다. 나머지 논문 · 특허는 위 「항목 추가」 형식으로 `record` 에 넣는다(DOI · 특허번호 등 확인 가능한 것만).
