@@ -106,11 +106,10 @@ function authorLine(authors = [], me) {
   return authors.map((a) => (a === me ? `<b class="me">${esc(a)}</b>` : esc(a))).join(", ");
 }
 
-function recordLinks(r, profile) {
+function recordLinks(r) {
   const l = [];
   if (r.doi) l.push(ext(`https://doi.org/${r.doi}`, "DOI"));
   if (r.pmid) l.push(ext(`https://pubmed.ncbi.nlm.nih.gov/${r.pmid}/`, "PubMed"));
-  if (r.type === "patent" && profile) l.push(ext(profile, "Lens profile"));
   if (r.url) l.push(ext(r.url, "Link"));
   return l.length ? `<p class="links">${l.join("")}</p>` : "";
 }
@@ -120,7 +119,7 @@ const posOf = (r, me) => {
   return i < 0 ? "" : `${i + 1}/${r.authors.length}`;
 };
 
-function recordItem(r, me, all, profile) {
+function recordItem(r, me, all) {
   const when = r.ongoing ? `<span class="when mono">${bi(UI.ongoing)}</span>` : r.month ? `<span class="when mono">${r.year}.${String(r.month).padStart(2, "0")}</span>` : "";
   const review = r.subtype === "review" ? `<span class="kind kind-review">${bi(UI.review)}</span>` : r.subtype === "preprint" ? `<span class="kind kind-review">${bi(UI.preprint)}</span>` : "";
   const kind = `<p class="kinds"><span class="kind kind-${r.type}">${bi(UI[r.type])}</span>${review}${when}</p>`;
@@ -143,7 +142,7 @@ function recordItem(r, me, all, profile) {
       (n ? `<p class="venue"><a href="#record" data-lab-papers="${n}">${bi(UI.labPapers)} ${n}</a></p>` : "") +
       `<p class="self">${bi(UI.selfReported)}</p>`;
   }
-  return `<li class="item">${kind}<h4>${title}</h4>${meta}${recordLinks(r, profile)}</li>`;
+  return `<li class="item">${kind}<h4>${title}</h4>${meta}${recordLinks(r)}</li>`;
 }
 
 function counts(record) {
@@ -159,7 +158,7 @@ function counts(record) {
 }
 
 function yearBlock(g, cv) {
-  const list = (items) => `<ul class="items">${items.map((r) => recordItem(r, cv.myName, cv.record, cv.meta?.patentProfile)).join("")}</ul>`;
+  const list = (items) => `<ul class="items">${items.map((r) => recordItem(r, cv.myName, cv.record)).join("")}</ul>`;
   if (g.items.length < MONTH_VIEW_MIN) return list(g.items);
   const label = (m) => (m === ONGOING ? bi(UI.ongoing) : m ? bi({ ko: `${m}월`, en: MONTHS[m] }) : bi(UI.monthUnknown));
   const months = groupByMonth(g.items)

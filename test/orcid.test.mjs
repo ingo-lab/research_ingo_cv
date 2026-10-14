@@ -122,7 +122,7 @@ test("describe lists every kept and skipped work so a sync log shows exactly wha
   assert.match(text, /skipped .*No proof at all.*identifier/);
 });
 
-test("ORCID patent ids are kept only as proof (not shown); patents link to the Lens profile; preprints are marked", () => {
+test("ORCID patent ids are kept only as proof (not shown); preprints are marked", () => {
   const w = (o) => ({ "work-summary": [summary(o)] });
   const { record } = parseWorks({
     group: [
@@ -136,6 +136,8 @@ test("ORCID patent ids are kept only as proof (not shown); patents link to the L
   const page = renderPage({ ...cv, record: [...cv.record, ...record.map((r) => ({ ...r, authors: ["Jung B"], venue: "" }))] });
   assert.ok(!page.includes("133-544-147-073-270"));
   assert.ok(!page.includes("lens.org/lens/patent"));
-  assert.match(page, /href="https:\/\/link\.lens\.org\/iKq9HjWBeUd"[^>]*>Lens profile/);
+  const contact = page.slice(page.indexOf('id="contact"'));
+  assert.ok(contact.includes('href="https://link.lens.org/iKq9HjWBeUd"'));
+  assert.ok(!page.slice(0, page.indexOf('id="contact"')).includes("link.lens.org"));
   assert.match(page, /data-count="preprints" data-to="1"/);
 });
