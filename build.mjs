@@ -2,6 +2,7 @@
 import { readFileSync, writeFileSync, mkdirSync, rmSync, cpSync } from "node:fs";
 import { validate, renderPage } from "./src/render.mjs";
 import { safeMerge } from "./src/orcid.mjs";
+import { assetVersion } from "./src/assets.mjs";
 
 const root = new URL(".", import.meta.url);
 const dist = new URL("dist/", root);
@@ -21,5 +22,7 @@ if (warnings.length) console.warn(`비어 있는 칸(화면에 '준비 중'):\n 
 rmSync(dist, { recursive: true, force: true });
 mkdirSync(dist, { recursive: true });
 cpSync(new URL("public/", root), dist, { recursive: true });
-writeFileSync(new URL("index.html", dist), renderPage(cv));
+// Version the assets by content so a new deploy never pairs new HTML with a cached old stylesheet.
+const version = assetVersion(root);
+writeFileSync(new URL("index.html", dist), renderPage(cv, { assetVersion: version }));
 console.log("built dist/index.html");

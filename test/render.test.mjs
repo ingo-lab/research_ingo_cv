@@ -168,23 +168,6 @@ test("count-up numbers keep their final value in the HTML (works without JS)", (
   assert.match(html, new RegExp(`<b data-count="papers" data-to="${n}">${n}</b>`));
 });
 
-const side = () => html.slice(html.indexOf("<aside"), html.indexOf("</aside>"));
-
-test("the profile is a full-height left panel placed before the content", () => {
-  assert.ok(html.indexOf("<aside") > 0 && html.indexOf("<aside") < html.indexOf("<main"));
-  assert.match(html, /<aside class="side"/);
-});
-
-test("the left panel carries the name, a personal intro, and every link", () => {
-  const s = side();
-  assert.match(s, /Bokeum Jung/);
-  assert.ok(s.includes(esc(cv.person.intro.en)), "intro (en)");
-  assert.ok(s.includes(esc(cv.person.intro.ko)), "intro (ko)");
-  for (const x of cv.identifiers) assert.ok(s.includes(`href="${x.url}"`), x.url);
-  for (const e of cv.contact.emails) assert.ok(s.includes(`href="mailto:${e}"`), e);
-  assert.ok(s.includes(`href="${cv.contact.github}"`), "github");
-});
-
 test("the intro is about the person, not a slogan: affiliation, interests and the lab", () => {
   const ko = cv.person.intro.ko;
   assert.match(ko, /충남대학교 의과대학/);
@@ -266,24 +249,6 @@ test("the stylesheet has no grid pattern backgrounds", () => {
   assert.doesNotMatch(css, /linear-gradient\(\s*var\(--emulsion-faint\)/);
 });
 
-test("the blue name block is at the very top of the left panel, with the intro and links below it", () => {
-  const s = html.slice(html.indexOf("<aside"), html.indexOf("</aside>"));
-  const top = s.indexOf('class="side-top"');
-  const body = s.indexOf('class="side-body"');
-  assert.ok(top >= 0 && body > top, "side-top then side-body");
-  const topHtml = s.slice(top, body);
-  assert.match(topHtml, /<h1>/);
-  assert.doesNotMatch(topHtml, /class="intro"/);
-  const bodyHtml = s.slice(body);
-  for (const k of ['class="intro"', 'class="side-links"', 'class="toc"']) assert.ok(bodyHtml.includes(k), k);
-});
-
-test("the left panel's body is not painted with the brand blue (blue stays at the top)", () => {
-  const css = readFileSync(new URL("../public/styles.css", import.meta.url), "utf8");
-  const rule = /\.side\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
-  assert.doesNotMatch(rule, /var\(--(cyanotype|prussian)\)/);
-});
-
 // ---- honorific + ongoing program ----
 test('Korean text always says "교수님" for the professor (never a bare "교수")', () => {
   assert.doesNotMatch(JSON.stringify(cv), /조은경 교수(?!님)/);
@@ -349,13 +314,13 @@ test("the education period shows the start year and that it is ongoing", () => {
   assert.doesNotMatch(edu, /class="tbd"/);
 });
 
-test("the program entry carries its full name, spelled KCHAMP (not KCHAMPf), and its period", () => {
+test("the program entry carries its full name, spelled KCHAMP (not KCHAMPf), and is marked ongoing", () => {
   const rec = html.slice(html.indexOf('id="record"'), html.indexOf('id="education"'));
   assert.match(rec, /KAIST-충남대 의과대학 의과학자 양성 프로그램/);
   assert.match(rec, /\(KCHAMP\)/);
   assert.doesNotMatch(html, /KCHAMPf/);
   assert.doesNotMatch(JSON.stringify(cv), /KCHAMPf/);
-  assert.match(rec, /졸업/);
+  assert.match(rec, /진행 중/);
 });
 
 test('the faculty advisor 구태윤 is named with "교수님" and no English spelling is invented', () => {
@@ -368,4 +333,135 @@ test("the intro mentions the 2023 enrollment and the current year of study", () 
   assert.match(cv.person.intro.ko, /2023/);
   assert.match(cv.person.intro.ko, /의학과 1학년/);
   assert.match(cv.person.intro.en, /2023/);
+});
+
+// ---- layout: blue hero on top, sticky English table of contents on the left, content in the centre ----
+const HANGUL = /[가-힣]/;
+const tagsOff = (s) => s.replace(/<[^>]+>/g, " ");
+const css = readFileSync(new URL("../public/styles.css", import.meta.url), "utf8");
+const ruleOf = (sel) => new RegExp(`(?:^|\\n)${sel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\{([^}]*)\\}`).exec(css)?.[1] ?? "";
+
+test("a hero banner comes first, then the layout with the table of contents rail and the content", () => {
+  const hero = html.indexOf('<header class="hero"');
+  const layout = html.indexOf('<div class="layout"');
+  const rail = html.indexOf('<aside class="rail"');
+  const main = html.indexOf("<main");
+  assert.ok(hero > 0 && hero < layout && layout < rail && rail < main, "hero < layout < rail < main");
+});
+
+test("the hero carries the name, role, affiliation and the personal intro, in both languages", () => {
+  const hero = html.slice(html.indexOf('<header class="hero"'), html.indexOf("</header>", html.indexOf('<header class="hero"')));
+  assert.match(hero, /Bokeum Jung/);
+  assert.ok(hero.includes(esc(cv.person.intro.ko)), "intro ko");
+  assert.ok(hero.includes(esc(cv.person.intro.en)), "intro en");
+  assert.match(hero, /충남대학교 의과대학/);
+});
+
+test("contact links live only in the Contact section: not in the hero, not in the rail", () => {
+  const hero = html.slice(html.indexOf('<header class="hero"'), html.indexOf("</header>", html.indexOf('<header class="hero"')));
+  const rail = html.slice(html.indexOf('<aside class="rail"'), html.indexOf("</aside>"));
+  for (const part of [hero, rail]) {
+    assert.doesNotMatch(part, /mailto:/);
+    for (const x of cv.identifiers) assert.ok(!part.includes(x.url), x.url);
+    assert.ok(!part.includes(cv.contact.github), "github");
+  }
+  const contact = html.slice(html.indexOf('id="contact"'), html.indexOf("<footer"));
+  for (const e of cv.contact.emails) assert.ok(contact.includes(`href="mailto:${e}"`), e);
+  for (const x of cv.identifiers) assert.ok(contact.includes(`href="${x.url}"`), x.url);
+  assert.ok(contact.includes(`href="${cv.contact.github}"`), "github");
+});
+
+test("the table of contents and the section headings are English in the Korean version too", () => {
+  const toc = html.slice(html.indexOf('class="toc"'), html.indexOf("</nav>", html.indexOf('class="toc"')));
+  assert.doesNotMatch(tagsOff(toc), HANGUL);
+  assert.doesNotMatch(toc, /data-l=/);
+  const headings = [...html.matchAll(/<h2>(.*?)<\/h2>/g)].map((m) => m[1]);
+  assert.equal(headings.length, 5);
+  for (const h of headings) {
+    assert.doesNotMatch(h, HANGUL, h);
+    assert.doesNotMatch(h, /data-l=/, h);
+  }
+  assert.deepEqual(headings, ["Research", "Education", "Projects", "Interests &amp; Skills", "Contact"]);
+});
+
+test("the top navigation used on small screens is English as well", () => {
+  const nav = html.slice(html.indexOf('class="nav"'), html.indexOf("</nav>", html.indexOf('class="nav"')));
+  assert.doesNotMatch(tagsOff(nav), HANGUL);
+});
+
+test("the hero is the bright brand blue and the page below it is white", () => {
+  assert.match(ruleOf(".hero"), /var\(--prussian\)/);
+  assert.match(ruleOf("body"), /background:\s*var\(--paper\)/);
+});
+
+test("the hero and the layout are centred with a maximum width", () => {
+  for (const sel of [".hero-in", ".layout"]) {
+    const r = ruleOf(sel);
+    assert.match(r, /max-width:\s*\d+px/, `${sel} max-width`);
+    assert.match(r, /margin:\s*0 auto/, `${sel} centred`);
+  }
+});
+
+test("the table of contents rail is sticky on wide screens", () => {
+  assert.match(ruleOf(".rail"), /position:\s*sticky/);
+});
+
+// ---- single fixed language/theme control, program wording, Throughline project, cache busting ----
+test("there is exactly one language button and one theme button", () => {
+  assert.equal((html.match(/data-action="lang"/g) || []).length, 1);
+  assert.equal((html.match(/data-action="theme"/g) || []).length, 1);
+});
+
+test("the language/theme control is fixed to the top-right of the window", () => {
+  const r = ruleOf(".tools");
+  assert.match(r, /position:\s*fixed/);
+  assert.match(r, /top:\s*\d+px/);
+  assert.match(r, /right:\s*\d+px/);
+});
+
+test('the program entry says "진행 중" but not "졸업 때까지"', () => {
+  const rec = html.slice(html.indexOf('id="record"'), html.indexOf('id="education"'));
+  assert.match(rec, /진행 중/);
+  assert.doesNotMatch(rec, /졸업/);
+  assert.doesNotMatch(JSON.stringify(cv), /졸업 때까지/);
+});
+
+test("Throughline · Bloom is listed as a project, briefly, without personal or internal details", () => {
+  const proj = html.slice(html.indexOf('id="projects"'), html.indexOf('id="skills"'));
+  assert.match(proj, /Throughline · Bloom/);
+  assert.match(proj, /PubMed/);
+  assert.doesNotMatch(html, /Darren|com\.darren|투자|종목/);
+  const t = proj.slice(proj.indexOf("Throughline"));
+  assert.ok(t.length < 1400, `Throughline block too long: ${t.length}`);
+});
+
+test("assets get a version query when a version is given, so a new deploy never mixes with an old cached stylesheet", () => {
+  const v = renderPage(cv, { assetVersion: "abc12345" });
+  assert.match(v, /href="styles\.css\?v=abc12345"/);
+  assert.match(v, /src="site\.js\?v=abc12345"/);
+  assert.doesNotMatch(renderPage(cv), /\?v=/);
+});
+
+test("the asset version is a content hash: stable for the same files, different when a file changes", async () => {
+  const { assetVersion } = await import("../src/assets.mjs");
+  const { mkdtempSync, writeFileSync, mkdirSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { pathToFileURL } = await import("node:url");
+  const dir = mkdtempSync(`${tmpdir()}/cv-assets-`);
+  mkdirSync(`${dir}/public`);
+  writeFileSync(`${dir}/public/styles.css`, "a{}");
+  writeFileSync(`${dir}/public/site.js`, "1");
+  const root = pathToFileURL(`${dir}/`);
+  const v1 = assetVersion(root);
+  assert.match(v1, /^[0-9a-f]{10}$/);
+  assert.equal(assetVersion(root), v1);
+  writeFileSync(`${dir}/public/styles.css`, "a{color:red}");
+  assert.notEqual(assetVersion(root), v1);
+  assert.match(assetVersion(new URL("../", import.meta.url)), /^[0-9a-f]{10}$/);
+});
+
+test("build.mjs stamps the page with that version", () => {
+  const src = readFileSync(new URL("../build.mjs", import.meta.url), "utf8");
+  assert.match(src, /assetVersion\(/);
+  assert.match(src, /renderPage\(cv,\s*\{\s*assetVersion:\s*version\s*\}\)/);
 });

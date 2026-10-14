@@ -103,3 +103,21 @@ test("parseWorks keeps the publication month and parseEpmc reads it from firstPu
   assert.equal(parseEpmc({ resultList: { result: [{ firstPublicationDate: "2026-10-05" }] } }).month, 10);
   assert.equal(parseEpmc({ resultList: { result: [{ firstPublicationDate: "garbage" }] } }).month, undefined);
 });
+
+test("parseWorks reports how many ORCID entries there are of each raw type", () => {
+  const r = parseWorks(orcidJson);
+  assert.equal(r.typeCounts.JOURNAL_ARTICLE, 4);
+  assert.equal(r.typeCounts.PATENT, 1);
+  assert.equal(r.typeCounts.DATA_SET, 1);
+});
+
+test("describe lists every kept and skipped work so a sync log shows exactly what ORCID returned", async () => {
+  const { describe } = await import("../src/orcid.mjs");
+  const lines = describe(parseWorks(orcidJson));
+  const text = lines.join("\n");
+  assert.match(text, /types: .*JOURNAL_ARTICLE=4/);
+  assert.match(text, /PATENT=1/);
+  assert.match(text, /kept patent 2024 .*A patent.*KR 10-2024-0001234/);
+  assert.match(text, /kept paper 2026 .*New cohort paper.*10\.1000\/new\.1/);
+  assert.match(text, /skipped .*No proof at all.*identifier/);
+});
