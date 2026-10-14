@@ -50,7 +50,7 @@ test("validate rejects bad year, malformed emails and non-http links", () => {
 });
 
 test("renderPage has every section, the real name and affiliation", () => {
-  for (const id of ["about", "record", "education", "projects", "skills", "contact"]) {
+  for (const id of ["record", "education", "projects", "skills", "contact"]) {
     assert.match(html, new RegExp(`id="${id}"`), id);
   }
   assert.match(html, /<title>Bokeum Jung · /);
@@ -132,7 +132,7 @@ test("the patent count is not shown while there are no patents", () => {
 
 test("a fixed table of contents links to every section and each target exists", () => {
   const toc = html.slice(html.indexOf('class="toc"'), html.indexOf("</nav>", html.indexOf('class="toc"')));
-  for (const id of ["about", "record", "education", "projects", "skills", "contact"]) {
+  for (const id of ["record", "education", "projects", "skills", "contact"]) {
     assert.ok(toc.includes(`href="#${id}"`), `toc → ${id}`);
     assert.match(html, new RegExp(`<section id="${id}"`), `section ${id}`);
   }
@@ -164,5 +164,96 @@ test("each paper states the researcher's author position and a one-line topic", 
 });
 
 test("count-up numbers keep their final value in the HTML (works without JS)", () => {
-  assert.match(html, /<b data-count="papers" data-to="3">3<\/b>/);
+  const n = cv.record.filter((r) => r.type === "paper").length;
+  assert.match(html, new RegExp(`<b data-count="papers" data-to="${n}">${n}</b>`));
+});
+
+const side = () => html.slice(html.indexOf("<aside"), html.indexOf("</aside>"));
+
+test("the profile is a full-height left panel placed before the content", () => {
+  assert.ok(html.indexOf("<aside") > 0 && html.indexOf("<aside") < html.indexOf("<main"));
+  assert.match(html, /<aside class="side"/);
+});
+
+test("the left panel carries the name, a personal intro, and every link", () => {
+  const s = side();
+  assert.match(s, /Bokeum Jung/);
+  assert.ok(s.includes(esc(cv.person.intro.en)), "intro (en)");
+  assert.ok(s.includes(esc(cv.person.intro.ko)), "intro (ko)");
+  for (const x of cv.identifiers) assert.ok(s.includes(`href="${x.url}"`), x.url);
+  for (const e of cv.contact.emails) assert.ok(s.includes(`href="mailto:${e}"`), e);
+  assert.ok(s.includes(`href="${cv.contact.github}"`), "github");
+});
+
+test("the intro is about the person, not a slogan: affiliation, interests and the lab", () => {
+  const ko = cv.person.intro.ko;
+  assert.match(ko, /충남대학교 의과대학/);
+  assert.match(ko, /조은경 교수/);
+  assert.match(ko, /2024/);
+  assert.ok(ko.length > 80);
+});
+
+test("there is no separate About section duplicating the intro", () => {
+  assert.doesNotMatch(html, /id="about"/);
+});
+
+// ---- months: years with 3+ entries are split by month ----
+import { groupByMonth } from "../src/render.mjs";
+
+test("groupByMonth sorts months newest first and puts entries without a month last", () => {
+  const g = groupByMonth([{ month: 2, n: 1 }, { n: 2 }, { month: 10, n: 3 }, { month: 2, n: 4 }]);
+  assert.deepEqual(g.map((x) => x.month), [10, 2, 0]);
+  assert.deepEqual(g[1].items.map((i) => i.n), [1, 4]);
+});
+
+test("a year with three or more entries is shown month by month, newest first", () => {
+  const rec = html.slice(html.indexOf('id="record"'), html.indexOf('id="education"'));
+  const y2026 = cv.record.filter((r) => r.year === 2026);
+  assert.ok(y2026.length >= 3, "fixture: 2026 has 3+ entries");
+  const months = [...new Set(y2026.map((r) => r.month))].sort((a, b) => b - a);
+  const seen = [...rec.matchAll(/data-month="(\d+)"/g)].map((m) => Number(m[1]));
+  assert.deepEqual(seen.slice(0, months.length), months);
+});
+
+test("a year with fewer than three entries has no month headings", () => {
+  const small = structuredClone(cv);
+  small.record = small.record.filter((r) => r.year !== 2026);
+  assert.doesNotMatch(renderPage(small), /data-month=/);
+  const two = structuredClone(cv);
+  two.record = cv.record.filter((r) => r.year === 2026).slice(0, 2);
+  assert.doesNotMatch(renderPage(two), /data-month=/);
+});
+
+test("exactly three entries in a year triggers the month view", () => {
+  const three = structuredClone(cv);
+  three.record = cv.record.filter((r) => r.year === 2026).slice(0, 3);
+  assert.match(renderPage(three), /data-month=/);
+});
+
+test("every entry shows its year.month when known", () => {
+  const rec = html.slice(html.indexOf('id="record"'), html.indexOf('id="education"'));
+  for (const r of cv.record.filter((x) => x.month)) {
+    assert.ok(rec.includes(`${r.year}.${String(r.month).padStart(2, "0")}`), `${r.year}.${r.month}`);
+  }
+});
+
+test("validate rejects a month outside 1-12", () => {
+  const bad = structuredClone(cv);
+  bad.record[0].month = 13;
+  assert.ok(validate(bad).errors.some((e) => e.includes("record.0.month")));
+});
+
+test("the most recent paper (first author) is on the page, with a first-author label and review badge", () => {
+  const p = cv.record.find((r) => r.doi === "10.1038/s12276-026-01852-7");
+  assert.ok(p, "cv.json has the Oct 2026 review");
+  assert.equal(p.authors[0], cv.myName);
+  assert.match(html, /Mitophagy in pathogenesis/);
+  assert.match(html, /data-pos="1\/7"/);
+  assert.match(html, /제1저자/);
+  assert.match(html, /kind-review/);
+});
+
+test("an empty education period renders nothing instead of a placeholder", () => {
+  const edu = html.slice(html.indexOf('id="education"'), html.indexOf('id="projects"'));
+  assert.doesNotMatch(edu, /class="tbd"/);
 });

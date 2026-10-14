@@ -31,9 +31,11 @@
 - 수동 실행: `node scripts/sync-orcid.mjs` (인터넷 필요). 다른 ORCID 는 `ORCID_ID=...` 환경변수.
 
 ## 항목 추가
-논문: `{ "year": 2026, "type": "paper", "title": "...", "authors": ["A B", "Jung B"], "venue": "...", "doi": "10.xxxx/...", "pmid": "...", "topic": {"ko": "한 줄 설명", "en": "One-line topic"} }`
-특허: `{ "year": 2024, "type": "patent", "title": "...", "inventors": ["Jung B"], "number": "10-2024-0000000", "country": "KR", "status": "등록" }`
-`myName`(`Jung B`)과 같은 저자 이름은 자동으로 강조된다.
+논문: `{ "year": 2026, "month": 10, "type": "paper", "subtype": "review", "title": "...", "authors": ["A B", "Jung B"], "venue": "...", "doi": "10.xxxx/...", "pmid": "...", "topic": {"ko": "한 줄 설명", "en": "One-line topic"} }`
+특허: `{ "year": 2024, "month": 5, "type": "patent", "title": "...", "inventors": ["Jung B"], "number": "10-2024-0000000", "country": "KR", "status": "등록" }`
+- `month`(1–12)는 선택. 있으면 항목에 `2026.10` 로 표시되고, **한 해에 업적이 3개 이상이면 그 해는 월별(최신 월 먼저)로 나뉜다**(기준값 `MONTH_VIEW_MIN`, `src/render.mjs`). 월을 모르는 항목은 "월 미상"으로 맨 뒤.
+- `subtype: "review"` 는 "리뷰" 배지. `myName`(`Jung B`)과 같은 저자 이름은 자동 강조되고, 첫 번째 저자면 "제1저자" 로 표시된다.
+- ORCID 동기화는 ORCID 의 발행 월 → 없으면 Europe PMC 의 `firstPublicationDate` 로 월을 채운다.
 
 ## 내용 규칙 (INGO AGENTS.md §6 에서 가져옴)
 - 사실만 쓴다. 날짜 · 수치(`stats`, `timeline`)에는 `source` 가 필수이고, 없으면 빌드가 실패한다.
@@ -41,5 +43,5 @@
 - 링크는 `http(s)` 만 허용(`validate`).
 
 ## 채워야 할 칸
-`npm run build` 경고 목록이 정본이다. 지금: 학년/기간(`education.0.period`).
+`npm run build` 경고 목록이 정본이다. 지금: 입학 연도(`education.0.period`, 비어 있으면 화면에 아무것도 안 나온다), GuideOne 기간(`projects.1.period`).
 ORCID 에는 논문 6편 · 특허 3건이 있다고 하나, 번호로 확인된 3편만 넣었다. 나머지 논문 · 특허는 위 「항목 추가」 형식으로 `record` 에 넣는다(DOI · 특허번호 등 확인 가능한 것만).

@@ -96,3 +96,10 @@ test("safeMerge falls back to the hand-written CV when synced data would fail va
   assert.equal(good.usedSync, true);
   assert.ok(good.cv.record.length > cv.record.length);
 });
+
+test("parseWorks keeps the publication month and parseEpmc reads it from firstPublicationDate", () => {
+  const withMonth = { group: [{ "work-summary": [{ title: { title: { value: "M" } }, type: "JOURNAL_ARTICLE", "publication-date": { year: { value: "2026" }, month: { value: "03" } }, "external-ids": { "external-id": [{ "external-id-type": "doi", "external-id-value": "10.1/m" }] } }] }] };
+  assert.equal(parseWorks(withMonth).record[0].month, 3);
+  assert.equal(parseEpmc({ resultList: { result: [{ firstPublicationDate: "2026-10-05" }] } }).month, 10);
+  assert.equal(parseEpmc({ resultList: { result: [{ firstPublicationDate: "garbage" }] } }).month, undefined);
+});
