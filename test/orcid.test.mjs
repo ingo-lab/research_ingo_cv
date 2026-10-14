@@ -139,5 +139,7 @@ test("ORCID patent ids are kept only as proof (not shown); preprints are marked"
   const contact = page.slice(page.indexOf('id="contact"'));
   assert.ok(contact.includes('href="https://link.lens.org/iKq9HjWBeUd"'));
   assert.ok(!page.slice(0, page.indexOf('id="contact"')).includes("link.lens.org"));
+  const card = page.slice(page.indexOf("Some patent"));
+  assert.ok(card.slice(0, card.indexOf("</li>")).includes('href="https://orcid.org/0009-0003-8264-3228"'));
   assert.match(page, /data-count="preprints" data-to="1"/);
 });
