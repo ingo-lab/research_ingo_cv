@@ -243,6 +243,16 @@
         "Vite",
         "Supabase",
         "Cloudflare"
+      ],
+      "topics": [
+        {
+          "ko": "연구 도구",
+          "en": "Research tooling"
+        },
+        {
+          "ko": "연구실 워크플로",
+          "en": "Lab workflow"
+        }
       ]
     },
     {
@@ -256,7 +266,20 @@
       "role": {
         "ko": "기획 · 개발",
         "en": "Planning · development"
-      }
+      },
+      "topics": [
+        {
+          "ko": "임상",
+          "en": "Clinical"
+        }
+      ],
+      "stack": [
+        "TypeScript",
+        "React",
+        "Vite",
+        "Supabase",
+        "Cloudflare"
+      ]
     },
     {
       "id": "throughline",
@@ -274,6 +297,16 @@
         "Expo",
         "React Native",
         "TypeScript"
+      ],
+      "topics": [
+        {
+          "ko": "기술 성숙도",
+          "en": "Technology maturity"
+        },
+        {
+          "ko": "상업화",
+          "en": "Commercialization"
+        }
       ]
     }
   ],

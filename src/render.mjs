@@ -182,7 +182,7 @@ const eduItem = (e) => {
 };
 
 const projectItem = (p) =>
-  `<li class="proj"><div class="proj-head"><h3>${esc(p.name)}</h3>${p.period ? `<span class="mono period">${bi(p.period)}</span>` : ""}</div><p>${bi(p.summary)}</p><p class="role mono">${bi(p.role)}</p>${p.stack?.length ? `<ul class="stack">${p.stack.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}</li>`;
+  `<li class="proj"><div class="proj-head"><h3>${esc(p.name)}</h3>${p.period ? `<span class="mono period">${bi(p.period)}</span>` : ""}</div><p>${bi(p.summary)}</p><p class="role mono">${bi(p.role)}</p>${p.topics?.length ? `<ul class="stack topics">${p.topics.map((t) => `<li>${bi(t)}</li>`).join("")}</ul>` : ""}${p.stack?.length ? `<ul class="stack">${p.stack.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}</li>`;
 
 function skillsBlock(cv) {
   const chips = cv.interests.map((i) => `<li>${bi(i.label)}</li>`).join("");
