@@ -260,8 +260,8 @@
       "name": "GuideOne (INGO Clinical)",
       "period": "",
       "summary": {
-        "ko": "INGO 의 임상 트랙.",
-        "en": "The clinical track of INGO."
+        "ko": "한국 의료진을 위한 임상 참고 · 학습 모바일 앱. INGO 의 임상 트랙.",
+        "en": "A mobile clinical reference and learning app for Korean clinicians. The clinical track of INGO."
       },
       "role": {
         "ko": "기획 · 개발",
@@ -269,15 +269,19 @@
       },
       "topics": [
         {
-          "ko": "임상",
-          "en": "Clinical"
+          "ko": "임상 가이드라인",
+          "en": "Clinical guidelines"
+        },
+        {
+          "ko": "의학 교육",
+          "en": "Medical education"
         }
       ],
       "stack": [
+        "Expo",
+        "React Native",
         "TypeScript",
-        "React",
-        "Vite",
-        "Supabase",
+        "FastAPI",
         "Cloudflare"
       ]
     },
