@@ -314,13 +314,13 @@ test("the education period shows the start year and that it is ongoing", () => {
   assert.doesNotMatch(edu, /class="tbd"/);
 });
 
-test("the program entry carries its full name, spelled KCHAMP (not KCHAMPf), and its period", () => {
+test("the program entry carries its full name, spelled KCHAMP (not KCHAMPf), and is marked ongoing", () => {
   const rec = html.slice(html.indexOf('id="record"'), html.indexOf('id="education"'));
   assert.match(rec, /KAIST-충남대 의과대학 의과학자 양성 프로그램/);
   assert.match(rec, /\(KCHAMP\)/);
   assert.doesNotMatch(html, /KCHAMPf/);
   assert.doesNotMatch(JSON.stringify(cv), /KCHAMPf/);
-  assert.match(rec, /졸업/);
+  assert.match(rec, /진행 중/);
 });
 
 test('the faculty advisor 구태윤 is named with "교수님" and no English spelling is invented', () => {
@@ -404,4 +404,46 @@ test("the hero and the layout are centred with a maximum width", () => {
 
 test("the table of contents rail is sticky on wide screens", () => {
   assert.match(ruleOf(".rail"), /position:\s*sticky/);
+});
+
+// ---- single fixed language/theme control, program wording, Throughline project, cache busting ----
+test("there is exactly one language button and one theme button", () => {
+  assert.equal((html.match(/data-action="lang"/g) || []).length, 1);
+  assert.equal((html.match(/data-action="theme"/g) || []).length, 1);
+});
+
+test("the language/theme control is fixed to the top-right of the window", () => {
+  const r = ruleOf(".tools");
+  assert.match(r, /position:\s*fixed/);
+  assert.match(r, /top:\s*\d+px/);
+  assert.match(r, /right:\s*\d+px/);
+});
+
+test('the program entry says "진행 중" but not "졸업 때까지"', () => {
+  const rec = html.slice(html.indexOf('id="record"'), html.indexOf('id="education"'));
+  assert.match(rec, /진행 중/);
+  assert.doesNotMatch(rec, /졸업/);
+  assert.doesNotMatch(JSON.stringify(cv), /졸업 때까지/);
+});
+
+test("Throughline · Bloom is listed as a project, briefly, without personal or internal details", () => {
+  const proj = html.slice(html.indexOf('id="projects"'), html.indexOf('id="skills"'));
+  assert.match(proj, /Throughline · Bloom/);
+  assert.match(proj, /PubMed/);
+  assert.doesNotMatch(html, /Darren|com\.darren|투자|종목/);
+  const t = proj.slice(proj.indexOf("Throughline"));
+  assert.ok(t.length < 1400, `Throughline block too long: ${t.length}`);
+});
+
+test("assets get a version query when a version is given, so a new deploy never mixes with an old cached stylesheet", () => {
+  const v = renderPage(cv, { assetVersion: "abc12345" });
+  assert.match(v, /href="styles\.css\?v=abc12345"/);
+  assert.match(v, /src="site\.js\?v=abc12345"/);
+  assert.doesNotMatch(renderPage(cv), /\?v=/);
+});
+
+test("the build stamps the assets with a content hash", () => {
+  const out = readFileSync(new URL("../dist/index.html", import.meta.url), "utf8");
+  assert.match(out, /styles\.css\?v=[0-9a-f]{8,}/);
+  assert.match(out, /site\.js\?v=[0-9a-f]{8,}/);
 });

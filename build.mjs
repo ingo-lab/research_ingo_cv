@@ -1,5 +1,6 @@
 // node build.mjs → dist/ (no dependencies). Fails on schema errors, lists empty fields as warnings.
 import { readFileSync, writeFileSync, mkdirSync, rmSync, cpSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { validate, renderPage } from "./src/render.mjs";
 import { safeMerge } from "./src/orcid.mjs";
 
@@ -21,5 +22,11 @@ if (warnings.length) console.warn(`비어 있는 칸(화면에 '준비 중'):\n 
 rmSync(dist, { recursive: true, force: true });
 mkdirSync(dist, { recursive: true });
 cpSync(new URL("public/", root), dist, { recursive: true });
-writeFileSync(new URL("index.html", dist), renderPage(cv));
+// Version the assets by content so a new deploy never pairs new HTML with a cached old stylesheet.
+const assetVersion = createHash("sha1")
+  .update(readFileSync(new URL("public/styles.css", root)))
+  .update(readFileSync(new URL("public/site.js", root)))
+  .digest("hex")
+  .slice(0, 10);
+writeFileSync(new URL("index.html", dist), renderPage(cv, { assetVersion }));
 console.log("built dist/index.html");

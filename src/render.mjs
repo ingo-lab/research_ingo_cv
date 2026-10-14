@@ -177,7 +177,7 @@ const eduItem = (e) => {
 };
 
 const projectItem = (p) =>
-  `<li class="proj"><div class="proj-head"><h3>${esc(p.name)}</h3>${p.period ? `<span class="mono period">${bi(p.period)}</span>` : ""}</div><p>${bi(p.summary)}</p><p class="role mono">${bi(p.role)}</p></li>`;
+  `<li class="proj"><div class="proj-head"><h3>${esc(p.name)}</h3>${p.period ? `<span class="mono period">${bi(p.period)}</span>` : ""}</div><p>${bi(p.summary)}</p><p class="role mono">${bi(p.role)}</p>${p.stack?.length ? `<ul class="stack">${p.stack.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}</li>`;
 
 function skillsBlock(cv) {
   const chips = cv.interests.map((i) => `<li>${bi(i.label)}</li>`).join("");
@@ -209,7 +209,6 @@ function hero(cv) {
   const p = cv.person;
   return `<header class="hero" id="top">
   <div class="hero-in">
-    ${tools("hero-tools")}
     <div class="mono-badge" aria-hidden="true">${esc(monogram(p.name))}</div>
     <p class="eyebrow">${bi(p.role)}</p>
     <h1>${bi(p.name)}</h1>
@@ -219,7 +218,7 @@ function hero(cv) {
 </header>`;
 }
 
-const rail = () => `<aside class="rail">${toc()}${tools("rail-tools")}</aside>`;
+const rail = () => `<aside class="rail">${toc()}</aside>`;
 
 function body(cv) {
   const wrap = (id, inner) =>
@@ -236,7 +235,8 @@ function body(cv) {
 const nav = () =>
   `<nav class="nav" aria-label="Sections"><ul>${SECTIONS.map((s) => `<li><a href="#${s}">${bi(UI[s])}</a></li>`).join("")}</ul></nav>`;
 
-export function renderPage(cv) {
+export function renderPage(cv, opts = {}) {
+  const v = opts.assetVersion ? `?v=${esc(opts.assetVersion)}` : "";
   const title = `${plain(cv.person.name)} · ${plain(cv.person.affiliation)}`;
   return `<!doctype html>
 <html lang="ko" data-lang="ko">
@@ -249,15 +249,15 @@ export function renderPage(cv) {
 <meta property="og:description" content="${esc(plain(cv.person.intro, "en"))}">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preload" href="fonts/pretendard-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css${v}">
 <script>try{var t=localStorage.getItem("cv-theme");if(t)document.documentElement.dataset.theme=t;var l=localStorage.getItem("cv-lang");if(l){document.documentElement.dataset.lang=l;document.documentElement.lang=l}}catch(e){}</script>
 </head>
 <body>
 <a class="skip" href="#record">${bi(UI.skip)}</a>
+${tools("")}
 <div class="topbar"><div class="topbar-in">
   <a class="brand" href="#top" aria-label="Top"><img src="favicon.svg" alt="" width="20" height="20"><span class="mono">CV</span></a>
   ${nav()}
-  ${tools("top-tools")}
 </div></div>
 ${hero(cv)}
 <div class="layout">
@@ -267,7 +267,7 @@ ${body(cv)}
 <footer class="foot"><p class="mono">${bi(UI.updated)} ${esc(cv.meta?.updated ?? "")}${cv.meta?.syncedAt ? ` · <span data-synced="${esc(cv.meta.syncedAt)}">${bi(UI.synced)} ${esc(cv.meta.syncedAt)}</span>` : ""}</p></footer>
 </main>
 </div>
-<script src="site.js" defer></script>
+<script src="site.js${v}" defer></script>
 </body>
 </html>
 `;

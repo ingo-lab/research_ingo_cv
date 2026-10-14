@@ -40,14 +40,25 @@ function toEntry(s) {
 export function parseWorks(json) {
   const record = [];
   const skipped = [];
+  const typeCounts = {};
   for (const g of json?.group ?? []) {
     const summary = g?.["work-summary"]?.[0];
     if (!summary) continue;
+    const raw = String(summary.type ?? "UNKNOWN");
+    typeCounts[raw] = (typeCounts[raw] ?? 0) + 1;
     const { entry, skip } = toEntry(summary);
     if (entry) record.push(entry);
     else skipped.push(skip);
   }
-  return { record, skipped };
+  return { record, skipped, typeCounts };
+}
+
+// Plain-text lines for the sync log: exactly what ORCID returned and what was kept or skipped.
+export function describe({ record = [], skipped = [], typeCounts = {} }) {
+  const types = Object.entries(typeCounts).map(([k, n]) => `${k}=${n}`).join(", ") || "none";
+  const kept = record.map((r) => `kept ${r.type} ${r.year}${r.month ? `.${String(r.month).padStart(2, "0")}` : ""} "${r.title}" (${r.doi || r.number || r.url})`);
+  const skip = skipped.map((s) => `skipped "${s.title}": ${s.reason}`);
+  return [`ORCID types: ${types}`, ...kept, ...skip];
 }
 
 export function parseEpmc(json) {

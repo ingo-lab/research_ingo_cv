@@ -3,7 +3,7 @@
 Bokeum Jung 의 연구자 CV 사이트. 연구실적을 연도별(많은 해는 월별)로 보여 주고, ORCID 와 매일 자동으로 동기화한다.
 
 - **사이트:** https://ingo-lab.github.io/research_ingo_cv/ (GitHub Pages)
-- 한국어 / English 전환, 라이트 / 다크, 모바일 대응. 서버 · 빌드 의존성 없음(Node 22+).
+- 한국어 / English 전환(오른쪽 위에 고정된 버튼 하나), 라이트 / 다크, 모바일 대응. 서버 · 빌드 의존성 없음(Node 22+).
 - 디자인은 INGO v10 토큰(색 · 글꼴)을 쓰되, 밝고 단정하게: 파란색은 맨 위 히어로(이름 · 소개)에만, 나머지는 흰 바탕. 전체가 화면 가운데에 정렬되고, 히어로 아래 왼쪽에 목차가 고정된다. 목차와 섹션 제목은 한국어 화면에서도 영어(Research · Education · Projects · Interests & Skills · Contact). 격자 무늬 없음(테스트로 고정).
 
 ## 내용 고치기 (가장 자주 하는 일)
@@ -57,6 +57,7 @@ Bokeum Jung 의 연구자 CV 사이트. 연구실적을 연도별(많은 해는 
 
 안전장치: ORCID 나 네트워크가 실패하면 동기화 단계만 실패하고 **이전 데이터로 배포가 계속**된다. 합친 결과가 검증을 통과하지 못하면 ORCID 데이터를 무시하고 `cv.json` 만으로 만든다.
 
+- 동기화 로그는 ORCID 가 돌려준 **유형별 개수**(`ORCID types: JOURNAL_ARTICLE=…, PATENT=…`)와 가져온 항목 · 건너뛴 항목을 한 줄씩 보여 준다. 특허 · 논문이 안 보이면 먼저 이 로그를 본다.
 - 확인용 로그 한 줄: Actions 의 `pages` 실행 → `build` → 동기화 단계에 `synced N works from ORCID … (M skipped)`.
 - 로컬 실행: `node scripts/sync-orcid.mjs` (인터넷 필요). 다른 ORCID 는 `ORCID_ID=0000-0000-0000-0000`.
 - 논문 · 특허가 ORCID 에 없거나 형식이 달라 빠지면, 위 「연구실적 항목」 형식으로 `cv.json` 에 직접 넣는다.
@@ -105,7 +106,7 @@ npm run check   # 테스트 + 빌드 (PR 에서 ci.yml 이 같은 명령을 돌�
 | `src/render.mjs` | `cv.json` → HTML 순수 함수 · 검증(`validate`). 두 언어를 모두 넣고 CSS(`html[data-lang]`)로 하나만 보여 준다 |
 | `src/orcid.mjs` | ORCID / Europe PMC 응답 파싱 · 병합(`mergeRecord` · `safeMerge`) |
 | `scripts/sync-orcid.mjs` | 실제로 네트워크를 호출하는 동기화 스크립트 |
-| `build.mjs` | 위를 묶어 `dist/` 생성. 검증 오류면 실패, 빈 칸은 경고 |
+| `build.mjs` | 위를 묶어 `dist/` 생성. 검증 오류면 실패, 빈 칸은 경고. CSS · JS 주소에 내용 해시(`?v=…`)를 붙여서, 새로 배포해도 브라우저에 남은 예전 스타일과 섞이지 않는다 |
 | `public/styles.css` | 맨 위 토큰 블록은 INGO v10 에서 **그대로 복사**. 아래는 파란 히어로 · 왼쪽 고정 목차 · 가운데 내용 · 연도별 타임라인 |
 | `public/site.js` | 테마 · 언어 전환, 목차 현재 위치, 스크롤 등장, 숫자 올라가기. JS 없이도 내용은 다 보이고 "동작 줄이기" 설정이면 움직이지 않는다 |
 | `public/fonts/` | woff2 (OFL) |
