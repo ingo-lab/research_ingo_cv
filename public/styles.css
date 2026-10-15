@@ -299,3 +299,11 @@ html[data-lang="ko"] [data-l="en"], html[data-lang="en"] [data-l="ko"] { display
 .proj .stack { margin-top: 8px; margin-bottom: 0; }
 .proj .stack.topics + .stack { margin-top: 6px; }
 .stack.topics li { font-family: var(--sans, inherit); font-weight: 600; color: var(--prussian); background: var(--prussian-tint); border-color: transparent; }
+
+/* CV download button */
+.dl-wrap { margin: 14px 0 0; }
+.dl { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border: 1px solid var(--prussian); border-radius: 10px; color: var(--prussian); font-weight: 650; font-size: .9rem; transition: background .2s, color .2s; }
+.dl::before { content: "↓"; font-weight: 700; }
+.dl:hover { background: var(--prussian); color: #fff; text-decoration: none; }
+.dl-contact { margin-top: 18px; }
+@media print { .dl-wrap { display: none; } }

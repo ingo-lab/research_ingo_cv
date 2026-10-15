@@ -32,6 +32,17 @@ const UI = {
   theme: { ko: "테마 전환", en: "Toggle theme" },
   skip: { ko: "본문으로", en: "Skip to content" },
 };
+// Downloadable PDF of the CV (built by scripts/make-pdf.mjs), e.g. "Bokeum-Jung-CV-en.pdf".
+export const pdfName = (cv, lang) => `${plain(cv.person.name, "en").trim().replace(/\s+/g, "-")}-CV-${lang}.pdf`;
+
+// The download buttons sit between these markers so a failed PDF build can remove them.
+export const stripPdfLinks = (html) => html.replace(/<!--pdf-->[\s\S]*?<!--\/pdf-->/g, "");
+
+function pdfButton(cv) {
+  const a = (lang, label) => `<span data-l="${lang}"><a class="dl" href="${esc(pdfName(cv, lang))}" download>${label}</a></span>`;
+  return `<!--pdf-->${a("ko", "CV 다운로드 (PDF)")}${a("en", "Download CV (PDF)")}<!--/pdf-->`;
+}
+
 const SECTIONS = ["record", "education", "projects", "skills", "contact"];
 const KINDS = ["paper", "patent", "project", "lab", "program"];
 
@@ -47,7 +58,7 @@ export function bi(v) {
   return `<span data-l="ko">${esc(v.ko || v.en)}</span><span data-l="en">${esc(v.en || v.ko)}</span>`;
 }
 
-const plain = (v, lang = "ko") => (typeof v === "string" ? v : (v?.[lang] || v?.ko || v?.en || ""));
+export const plain = (v, lang = "ko") => (typeof v === "string" ? v : (v?.[lang] || v?.ko || v?.en || ""));
 
 export function emptyPaths(obj, prefix = "") {
   if (obj === "") return [prefix];
@@ -224,7 +235,7 @@ function hero(cv) {
 </header>`;
 }
 
-const rail = () => `<aside class="rail">${toc()}</aside>`;
+const rail = (cv) => `<aside class="rail">${toc()}<p class="dl-wrap">${pdfButton(cv)}</p></aside>`;
 
 function body(cv) {
   const wrap = (id, inner) =>
@@ -234,7 +245,7 @@ function body(cv) {
     wrap("education", `<ul class="edus">${cv.education.map(eduItem).join("")}</ul>`),
     wrap("projects", `<ul class="projs">${cv.projects.map(projectItem).join("")}</ul>`),
     wrap("skills", skillsBlock(cv)),
-    wrap("contact", `<ul class="ids wide">${allLinks(cv)}</ul>`),
+    wrap("contact", `<ul class="ids wide">${allLinks(cv)}</ul><p class="dl-wrap dl-contact">${pdfButton(cv)}</p>`),
   ].join("\n");
 }
 
@@ -283,7 +294,7 @@ ${tools("")}
 </div></div>
 ${hero(cv)}
 <div class="layout">
-${rail()}
+${rail(cv)}
 <main class="main">
 ${body(cv)}
 <footer class="foot"><p class="mono">${bi(UI.updated)} ${esc(cv.meta?.updated ?? "")}${cv.meta?.syncedAt ? ` · <span data-synced="${esc(cv.meta.syncedAt)}">${bi(UI.synced)} ${esc(cv.meta.syncedAt)}</span>` : ""}</p></footer>
