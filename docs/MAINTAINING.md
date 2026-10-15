@@ -112,3 +112,7 @@ npm run check   # 테스트 + 빌드 (PR 에서 ci.yml 이 같은 명령을 돌�
 | `public/fonts/` | woff2 (OFL) |
 
 자산 경로는 상대 경로라서 `/research_ingo_cv/` 같은 하위 경로에서도 동작한다(테스트로 고정).
+
+## CV PDF
+
+`src/cvdoc.mjs` 가 같은 `cv.json`(+ ORCID 결과)로 인쇄용 A4 CV(한국어 · English)를 만들고, 배포 때 `scripts/make-pdf.mjs` 가 Chrome 으로 `Bokeum-Jung-CV-ko.pdf` · `Bokeum-Jung-CV-en.pdf` 를 만든다. 사이트의 **Download CV** 버튼(왼쪽 목차 아래 · Contact)이 이 파일을 가리킨다. PDF 를 못 만들면(Chrome 없음 등) 그 단계만 실패하고 **버튼은 자동으로 빠진다**(깨진 링크 없음). 로컬에서 확인: `npm run build && CHROME_BIN=<chrome 경로> node scripts/make-pdf.mjs`.

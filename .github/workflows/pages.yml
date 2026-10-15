@@ -28,6 +28,9 @@ jobs:
         run: node scripts/sync-orcid.mjs
       - run: npm test
       - run: npm run build
+      - name: Make the downloadable CV PDFs (removes the download buttons if Chrome fails)
+        continue-on-error: true
+        run: node scripts/make-pdf.mjs
       - run: touch dist/.nojekyll
       - uses: actions/upload-pages-artifact@v5
         with:

@@ -9,6 +9,7 @@ A clean, bilingual (한국어 / English) CV site for a medical student and resea
 - **Research record by year** — papers, patents, lab experience and programs; busy years split by month.
 - **Auto-updating** — a daily job reads the public ORCID record and enriches papers through Europe PMC.
 - **Light, readable design** — one blue hero, a sticky table of contents, light/dark theme, mobile friendly, print friendly.
+- **Downloadable CV** — a clean A4 PDF (한국어 / English) is generated from the same data on every deploy.
 - **Zero dependencies** — plain Node 22 static generator, no framework, no tracking.
 
 ## How it works
